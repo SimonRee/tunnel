@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JavaScript Sandbox</title>
+
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <div
+      class="InformazioniBase"
+      style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        pointer-events: none;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          margin: 0px;
+          color: white;
+          font-family: Helvetica;
+        "
+      >
+        Top Left
+      </div>
+      <div
+        style="
+          position: absolute;
+          top: 0;
+          right: 0;
+          margin: 0px;
+          color: white;
+          font-family: Helvetica;
+        "
+      >
+        Top Right
+      </div>
+      <div
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          margin: 0px;
+          color: white;
+          font-family: Helvetica;
+        "
+      >
+        Bottom Left
+      </div>
+      <div
+        style="
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          margin: 0px;
+          color: white;
+          font-family: Helvetica;
+        "
+      >
+        Bottom Right
+      </div>
+    </div>
+    <!-- chiude il div informazioni base -->
+    <script src="src/index.js" type="module"></script>
+    <link rel="stylesheet" href="src/styles.css" />
+  </body>
+</html>
