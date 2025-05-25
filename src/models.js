@@ -32,39 +32,39 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
 export function loadAndPlaceModels(scene) {
   const modelsData = [
     {
-      path: "./dist/models/Comp.gltf",
+      path: "/models/Comp.gltf",
       pos: [-1.8, -0.1, 0],
       scale: 0.15,
       rotY: 60,
     },
     {
-      path: "./dist/models/barca.glb",
+      path: "/models/barca.glb",
       pos: [-1.8, -0.1, 1],
       scale: 0.3,
       rotY: 60,
     },
     {
-      path: "./dist/models/treno.glb",
+      path: "/models/treno.glb",
       pos: [-1.8, -0.1, -1],
       scale: 0.4,
       rotY: 0,
     },
     {
-      path: "./dist/models/farfalla.glb",
+      path: "/models/farfalla.glb",
       pos: [-1.8, 0.5, -0.5],
       scale: 0.2,
       rotY: 60,
       material: "vetro",
     },
     {
-      path: "./dist/models/mano.glb",
+      path: "/models/mano.glb",
       pos: [-1.8, 0.5, 0.5],
       scale: 0.2,
       rotY: 90,
       material: "metallo",
     },
     {
-      path: "./dist/models/tonno.glb",
+      path: "/models/tonno.glb",
       pos: [-1.8, -0.3, 0.5],
       scale: 0.2,
       rotY: 90,

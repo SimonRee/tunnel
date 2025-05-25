@@ -37,7 +37,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 //IMMAGINE PNG DI DERIANSKY
 // Caricamento della texture PNG
 const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load("./dist/DERIO.png");
+const texture = textureLoader.load("/DERIO.png");
 
 // Creazione del piano 16:9
 const width = 8; // Larghezza del piano
