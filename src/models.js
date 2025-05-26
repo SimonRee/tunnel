@@ -97,3 +97,45 @@ export function loadAndPlaceModels(scene) {
 
   scene.add(modelsGroup);
 }
+
+//FUNZIONE ROTAZIONE MODELLI  --posso rendere non uguali le rotazioni, modificando le rotazioni iniziali dei modelli nel modelsGroup
+export function RuotaModels() {
+  modelsGroup.children.forEach((model) => {
+    // Compute the bounding box center
+    const box = new THREE.Box3().setFromObject(model);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+
+    // Translate model to origin, rotate, then translate back
+    model.position.sub(center);
+    model.rotation.x += 0.001;
+    model.rotation.y += 0.001;
+    model.rotation.z += 0.001;
+    model.position.add(center);
+  });
+}
+
+// Funzione per ottenere i modelli cliccabili
+export function getClickableModels() {
+  return clickableModels;
+}
+
+//per fare l'animazione e spostamento dei modelli
+let focusedModel = null;
+export function focusModelOnCamera(model) {
+  focusedModel = model;
+}
+
+export function updateFocusedModel(camera) {
+  if (!focusedModel || !camera || !camera.getWorldDirection) return;
+
+  const direction = new THREE.Vector3();
+  camera.getWorldDirection(direction);
+
+  const targetPosition = new THREE.Vector3()
+    .copy(camera.position)
+    .add(direction.multiplyScalar(1));
+
+  // Interpolazione dolce verso la nuova posizione
+  focusedModel.position.lerp(targetPosition, 0.1); // 0.1 = velocità del lerp
+}

@@ -2,7 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
-import { loadAndPlaceModels} from "./models.js";
+import { loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel } from "./models.js";
+
+const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
+const mouse = new THREE.Vector2();
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x000000, 0, 100); // se voglio attivare fog nel tunnel devo mettere nel materiale del cilindro e tutti gli oggetti con il paramentro fog: false come ho fatto per il piano della faccia
@@ -238,6 +241,54 @@ function EndOfTunnel(positionAlongPath) {
   }
 }
 
+//RENDE OGGETTI CLICCABILI
+window.addEventListener("click", (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(getClickableModels(), true);
+  if (intersects.length > 0) {
+    let selected = intersects[0].object;
+    while (selected.parent && !getClickableModels().includes(selected)) {
+      selected = selected.parent;
+    }
+    focusModelOnCamera(selected);
+  }
+});
+
+
+//CAMBIA POINTER SU OGGETTO CLICCCABILE
+window.addEventListener("mousemove", (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+});
+
+let isHoveringClickable = false;
+
+function updateCursorOnHover() {
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(getClickableModels(), true);
+
+  if (intersects.length > 0) {
+    if (!isHoveringClickable) {
+      document.body.style.cursor = "pointer";
+      isHoveringClickable = true;
+    }
+  } else {
+    if (isHoveringClickable) {
+      document.body.style.cursor = "default";
+      isHoveringClickable = false;
+    }
+  }
+}
+
+
+
+//funzione di animazione per gestire le varie funzioni
 function animate() {
   requestAnimationFrame(animate);
   updateCamera();
@@ -247,8 +298,14 @@ function animate() {
   updateCameraFov(positionAlongPath);
   //aggiorna posizione e lookAt a fine tunnel
   EndOfTunnel(positionAlongPath);
+  //aggiorna il cursore sui modelli cliccabili
+  RuotaModels();
+  updateCursorOnHover();
+  updateFocusedModel(camera);
   renderer.render(scene, camera);
   controls.update();
 }
 
 animate();
+
+
