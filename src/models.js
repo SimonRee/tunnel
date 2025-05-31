@@ -6,6 +6,7 @@ const clickableModels = [];
 export const modelsGroup = new THREE.Group(); // Gruppo globale
 
 //CREAZIONE MATERIALI PER ALCUNI OGGETTI
+
 const vetroMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
   transmission: 1.0,
@@ -33,42 +34,84 @@ export function loadAndPlaceModels(scene) {
   const modelsData = [
     {
       path: "/models/Comp.gltf",
-      pos: [-1.8, -0.1, 0],
-      scale: 0.15,
-      rotY: 60,
-    },
-    {
-      path: "/models/barca.glb",
-      pos: [-1.8, -0.1, 1],
+      pos: [-3, -0.0, 0],
       scale: 0.3,
-      rotY: 60,
-    },
-    {
-      path: "/models/treno.glb",
-      pos: [-1.8, -0.1, -1],
-      scale: 0.4,
       rotY: 0,
     },
     {
+      path: "/models/barca.glb",
+      pos: [-2.77, -0.0, -1.15],
+      scale: 0.4,
+      rotY: -15,
+    },
+    {
+      path: "/models/treno.glb",
+      pos: [-2.12, -0.0, -2.12],
+      scale: 0.5,
+      rotY: 30,
+    },
+    {
       path: "/models/farfalla.glb",
-      pos: [-1.8, 0.5, -0.5],
-      scale: 0.2,
-      rotY: 60,
+      pos: [-1.15, 0.0, -2.77],
+      scale: 0.3,
+      rotY: -45,
       material: "vetro",
     },
     {
       path: "/models/mano.glb",
-      pos: [-1.8, 0.5, 0.5],
-      scale: 0.2,
-      rotY: 90,
+      pos: [0, 0.0, -3],
+      scale: 0.3,
+      rotY: 60,
       material: "metallo",
     },
     {
       path: "/models/tonno.glb",
-      pos: [-1.8, -0.3, 0.5],
-      scale: 0.2,
+      pos: [1.15, -0.0, -2.77],
+      scale: 0.25,
+      rotY: -75,
+      rotZ: 0,
+    },
+    {
+      path: "/models/AsianFake.glb",
+      pos: [2.12, -0.0, -2.12],
+      scale: 0.3,
       rotY: 90,
-      rotZ: -10,
+      rotZ: 0,
+    },
+    {
+      path: "/models/uovo.glb",
+      pos: [2.77, -0.0, -1.15],
+      scale: 0.3,
+      rotY: -105,
+      rotZ: 0,
+    },
+    {
+      path: "/models/reliquia.glb",
+      pos: [3, -0.0, 0],
+      scale: 0.3,
+      rotY: 120,
+      rotZ: 0,
+    },
+    {
+      path: "/models/morfeo.glb",
+      pos: [2.77, -0.0, 1.15],
+      scale: 0.3,
+      rotY: -135,
+      rotZ: 0,
+    },
+    {
+      path: "/models/qholla.glb",
+      pos: [2.12, -0.0, 2.12],
+      scale: 0.3,
+      rotY: 150,
+      rotZ: 0,
+    },
+    {
+      path: "/models/sirena.glb",
+      pos: [1.15, -0.0, 2.77],
+      scale: 0.3,
+      rotY: -165,
+      rotZ: 0,
     },
   ];
 
@@ -108,9 +151,9 @@ export function RuotaModels() {
 
     // Translate model to origin, rotate, then translate back
     model.position.sub(center);
-    model.rotation.x += 0.001;
-    model.rotation.y += 0.001;
-    model.rotation.z += 0.001;
+    model.rotation.x += 0.002;
+    model.rotation.y += 0.002;
+    model.rotation.z += 0.002;
     model.position.add(center);
   });
 }
@@ -122,13 +165,42 @@ export function getClickableModels() {
 
 //per fare l'animazione e spostamento dei modelli
 let focusedModel = null;
+let targetScale = null;
+let fadeCone = null;
+let coneTargetOpacity = 0;
+const fadeSpeed = 0.05; // Velocità con cui l'opacità sale
+
+export function createFadeCone(scene) {
+  const coneGeometry = new THREE.ConeGeometry(2.5, 3, 64, 1, true); // height = 3, raggio = 2
+  const coneMaterial = new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    opacity: 0,
+    side: THREE.BackSide,
+    depthWrite: false,
+  });
+
+  fadeCone = new THREE.Mesh(coneGeometry, coneMaterial);
+  fadeCone.position.set(0, 0, 0);
+  fadeCone.rotation.x = Math.PI; // punta in basso
+  scene.add(fadeCone);
+}
+
 export function focusModelOnCamera(model) {
+  if (focusedModel === model) return; // Se il modello cliccato è già quello attivo, non fare nulla
   focusedModel = model;
+  targetScale = model.scale.clone().multiplyScalar(0.6);
+
+  // Dopo 1 secondo attiva la transizione del cono
+  setTimeout(() => {
+    coneTargetOpacity = 1;
+  }, 1000);
 }
 
 export function updateFocusedModel(camera) {
   if (!focusedModel || !camera || !camera.getWorldDirection) return;
 
+  // Movimento verso davanti alla camera
   const direction = new THREE.Vector3();
   camera.getWorldDirection(direction);
 
@@ -136,6 +208,18 @@ export function updateFocusedModel(camera) {
     .copy(camera.position)
     .add(direction.multiplyScalar(1));
 
-  // Interpolazione dolce verso la nuova posizione
-  focusedModel.position.lerp(targetPosition, 0.1); // 0.1 = velocità del lerp
+  focusedModel.position.lerp(targetPosition, 0.1);
+
+  // Lerp della scala
+  if (targetScale) {
+    focusedModel.scale.lerp(targetScale, 0.1);
+  }
+
+  // Fading del cono
+  if (fadeCone) {
+    const currentOpacity = fadeCone.material.opacity;
+    if (Math.abs(currentOpacity - coneTargetOpacity) > 0.01) {
+      fadeCone.material.opacity = THREE.MathUtils.lerp(currentOpacity, coneTargetOpacity, fadeSpeed);
+    }
+  }
 }

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
-import { loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel } from "./models.js";
+import { loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
@@ -24,7 +24,7 @@ const finalFov = 40; // valore finale FOV a cui vuoi arrivare
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
 const light = new THREE.AmbientLight(0xffffff, 10); // soft white light
 scene.add(light);
-const PointLight = new THREE.PointLight(0xffffff, 15, 100);
+const PointLight = new THREE.PointLight(0xffffff, 15, 0);
 PointLight.position.set(0, 0, 0);
 scene.add(PointLight);
 const DirL = new THREE.DirectionalLight(0xffffff, 10);
@@ -62,10 +62,10 @@ const startPosition = new THREE.Vector3(10.7, 7.38, 0.12);
 const endPosition = new THREE.Vector3(10.52, 7.48, 0.53);
 
 // Creazione del cilindro wireframe segmentato
-const cylinderRadius = 2;
-const cylinderHeight = 5;
+const cylinderRadius = 4;
+const cylinderHeight = 4;
 const radialSegments = 64;
-const heightSegments = 40;
+const heightSegments = 16;
 
 // Creazione del cilindro principale con segmenti verticali
 const cylinderGeo = new THREE.CylinderGeometry(
@@ -100,7 +100,7 @@ for (let i = 0; i <= heightSegments; i++) {
 }
 
 // Creazione del tubo solido (visibile solo dall'interno)
-const tubeGeo = new THREE.TubeGeometry(spline, 200, 0.1, 30, false);
+const tubeGeo = new THREE.TubeGeometry(spline, 200, 0.12, 30, false);
 const wallMat = new THREE.MeshBasicMaterial({
   color: 0x000000,
   side: THREE.BackSide, // Visibile solo dall'interno
@@ -110,7 +110,7 @@ scene.add(tubeMesh);
 
 // Creazione del wireframe interno (leggermente più piccolo per evitare sovrapposizione)
 const edgesGeo = new THREE.EdgesGeometry(
-  new THREE.TubeGeometry(spline, 200, 0.099, 30, false),
+  new THREE.TubeGeometry(spline, 200, 0.119, 30, false),
   0.01 //questo valore se lo modifico cambia il numero di segmenti presenti nel tubo
 );
 const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
@@ -286,7 +286,7 @@ function updateCursorOnHover() {
   }
 }
 
-
+createFadeCone(scene); // Crea il cono inizialmente invisibile che oscura i modelli cliccabili dopo averne cliccato uno
 
 //funzione di animazione per gestire le varie funzioni
 function animate() {
