@@ -35,7 +35,7 @@ export function loadAndPlaceModels(scene) {
     {
       path: "/models/Comp.gltf",
       pos: [-3, -0.0, 0],
-      scale: 0.3,
+      scale: 0.25,
       rotY: 0,
     },
     {
@@ -81,7 +81,7 @@ export function loadAndPlaceModels(scene) {
     {
       path: "/models/uovo.glb",
       pos: [2.77, -0.0, -1.15],
-      scale: 0.3,
+      scale: 0.2,
       rotY: -105,
       rotZ: 0,
     },
@@ -109,7 +109,7 @@ export function loadAndPlaceModels(scene) {
     {
       path: "/models/sirena.glb",
       pos: [1.15, -0.0, 2.77],
-      scale: 0.3,
+      scale: 0.2,
       rotY: -165,
       rotZ: 0,
     },
@@ -191,14 +191,14 @@ export function focusModelOnCamera(model) {
   focusedModel = model;
   targetScale = model.scale.clone().multiplyScalar(0.6);
 
-  // ✉️ INVIA IL MESSAGGIO AL PARENT (Webflow)
+  // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
     window.parent.postMessage(
       {
         type: "modelClicked",
         modelIndex: model.userData.modelIndex
       },
-      "*" // Puoi sostituire * con l’URL preciso se vuoi maggiore sicurezza
+      "*"
     );
   }
 
@@ -219,8 +219,17 @@ export function updateFocusedModel(camera) {
     .copy(camera.position)
     .add(direction.multiplyScalar(1));
 
-  focusedModel.position.lerp(targetPosition, 0.1);
+  //focusedModel.position.lerp(targetPosition, 0.1);---------------------------------------------------------
+    
+  // Se non è in fase di ritorno al posto originale
+  if (!focusedModel.userData.targetPosition) {
+    focusedModel.position.lerp(targetPosition, 0.1);
+  }
 
+  // Se è in fase di ritorno al posto originale (reset)
+  if (focusedModel.userData.targetPosition) {
+    focusedModel.position.lerp(focusedModel.userData.targetPosition, 0.1);
+  }
   // Lerp della scala
   if (targetScale) {
     focusedModel.scale.lerp(targetScale, 0.1);
@@ -235,4 +244,27 @@ export function updateFocusedModel(camera) {
   }
 }
 
+// Gestione reset da Webflow quando si preme la X
+window.addEventListener("message", function(event) {
+  if (event.data && event.data.type === "resetModel") {
+    const index = event.data.modelIndex;
+    const model = modelsGroup.children.find(
+      (m) => m.userData.modelIndex === index
+    );
+    if (!model) return;
+
+    // Torna alla scala originale
+    const original = modelsData[index];
+    if (original) {
+      targetScale = new THREE.Vector3(original.scale, original.scale, original.scale);
+      focusedModel = model;
+
+      // Imposta posizione target per animazione di ritorno
+      model.userData.targetPosition = new THREE.Vector3(...original.pos);
+    }
+
+    // Nasconde il cono
+    coneTargetOpacity = 0;
+  }
+});
 
