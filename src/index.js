@@ -99,6 +99,12 @@ for (let i = 0; i <= heightSegments; i++) {
   scene.add(ringLines);
 }
 
+// Creazione del cilindro PIENO PER NON VEDERE IL TUNNEL
+const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4.5,64,1,true);
+const materialPIENO = new THREE.MeshStandardMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});
+const CILINDROPIENO = new THREE.Mesh(cylinderPIENO, materialPIENO);
+scene.add(CILINDROPIENO);
+
 // Creazione del tubo solido (visibile solo dall'interno)
 const tubeGeo = new THREE.TubeGeometry(spline, 200, 0.12, 30, false);
 const wallMat = new THREE.MeshBasicMaterial({

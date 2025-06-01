@@ -191,6 +191,17 @@ export function focusModelOnCamera(model) {
   focusedModel = model;
   targetScale = model.scale.clone().multiplyScalar(0.6);
 
+  // ✉️ INVIA IL MESSAGGIO AL PARENT (Webflow)
+  if (model.userData.modelIndex !== undefined) {
+    window.parent.postMessage(
+      {
+        type: "modelClicked",
+        modelIndex: model.userData.modelIndex
+      },
+      "*" // Puoi sostituire * con l’URL preciso se vuoi maggiore sicurezza
+    );
+  }
+
   // Dopo 1 secondo attiva la transizione del cono
   setTimeout(() => {
     coneTargetOpacity = 1;
@@ -223,3 +234,5 @@ export function updateFocusedModel(camera) {
     }
   }
 }
+
+
