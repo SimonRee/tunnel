@@ -170,6 +170,9 @@ let fadeCone = null;
 let coneTargetOpacity = 0;
 const fadeSpeed = 0.05; // Velocità con cui l'opacità sale
 
+let isResetting = false;//-------------------------------------------------------------
+let resetStartTime = null;
+
 export function createFadeCone(scene) {
   const coneGeometry = new THREE.ConeGeometry(2.5, 3, 64, 1, true); // height = 3, raggio = 2
   const coneMaterial = new THREE.MeshBasicMaterial({
@@ -211,19 +214,38 @@ export function focusModelOnCamera(model) {
 export function updateFocusedModel(camera) {
   if (!focusedModel || !camera || !camera.getWorldDirection) return;
 
-  // Movimento verso davanti alla camera
-  const direction = new THREE.Vector3();
-  camera.getWorldDirection(direction);
+  // Se siamo in fase di reset
+  if (isResetting && focusedModel.userData.targetPosition) {
+    // Controlla se il cono è diventato completamente trasparente
+    if (fadeCone && fadeCone.material.opacity <= 0.01) {
+      // Sposta il modello alla posizione originale
+      focusedModel.position.lerp(focusedModel.userData.targetPosition, 0.1);
+      focusedModel.scale.lerp(targetScale, 0.1);
 
-  const targetPosition = new THREE.Vector3()
-    .copy(camera.position)
-    .add(direction.multiplyScalar(1));
+      const dist = focusedModel.position.distanceTo(focusedModel.userData.targetPosition);
+      const scaleDiff = focusedModel.scale.distanceTo(targetScale);
 
-  focusedModel.position.lerp(targetPosition, 0.1);
-    
-  // Lerp della scala
-  if (targetScale) {
-    focusedModel.scale.lerp(targetScale, 0.1);
+      if (dist < 0.01 && scaleDiff < 0.01) {
+        // Reset completato
+        delete focusedModel.userData.targetPosition;
+        isResetting = false;
+        focusedModel = null;
+      }
+    }
+
+  } else {
+    // Movimento normale verso la camera
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+
+    const targetPosition = new THREE.Vector3()
+      .copy(camera.position)
+      .add(direction.multiplyScalar(1));
+
+    focusedModel.position.lerp(targetPosition, 0.1);
+    if (targetScale) {
+      focusedModel.scale.lerp(targetScale, 0.1);
+    }
   }
 
   // Fading del cono
@@ -235,3 +257,27 @@ export function updateFocusedModel(camera) {
   }
 }
 
+
+//COMUNICAZIONE DEL CLOSE-BUTTON CON WEBFLOW
+window.addEventListener("message", function(event) {
+  if (event.data && event.data.type === "resetModel") {
+    const index = event.data.modelIndex;
+    const model = modelsGroup.children.find(
+      (m) => m.userData.modelIndex === index
+    );
+    if (!model) return;
+
+    const original = modelsData[index];
+    if (!original) return;
+
+    // Avvia il reset
+    focusedModel = model;
+    targetScale = new THREE.Vector3(original.scale, original.scale, original.scale);
+    model.userData.targetPosition = new THREE.Vector3(...original.pos);
+    isResetting = true;
+    resetStartTime = performance.now();
+
+    // Nasconde subito il cono
+    coneTargetOpacity = 0;
+  }
+});
