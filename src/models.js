@@ -29,8 +29,6 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
   clearcoatRoughness: 0.1,
 });
 
-//FUNZIONE PER CARICARE I MODELLI
-export function loadAndPlaceModels(scene) {
   const modelsData = [
     {
       path: "/models/Comp.gltf",
@@ -115,6 +113,8 @@ export function loadAndPlaceModels(scene) {
     },
   ];
 
+//FUNZIONE PER CARICARE I MODELLI
+export function loadAndPlaceModels(scene) {
   modelsData.forEach((data, index) => {
     loader.load(data.path, (gltf) => {
       const model = gltf.scene;
@@ -228,8 +228,13 @@ export function updateFocusedModel(camera) {
 
   // Se è in fase di ritorno al posto originale (reset)
   if (focusedModel.userData.targetPosition) {
-    focusedModel.position.lerp(focusedModel.userData.targetPosition, 0.1);
+  focusedModel.position.lerp(focusedModel.userData.targetPosition, 0.1);
+
+  const distance = focusedModel.position.distanceTo(focusedModel.userData.targetPosition);
+  if (distance < 0.01) {
+    delete focusedModel.userData.targetPosition; // Rimuove la variabile una volta tornato
   }
+}
   // Lerp della scala
   if (targetScale) {
     focusedModel.scale.lerp(targetScale, 0.1);
