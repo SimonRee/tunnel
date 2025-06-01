@@ -219,22 +219,8 @@ export function updateFocusedModel(camera) {
     .copy(camera.position)
     .add(direction.multiplyScalar(1));
 
-  //focusedModel.position.lerp(targetPosition, 0.1);---------------------------------------------------------
+  focusedModel.position.lerp(targetPosition, 0.1);
     
-  // Se non è in fase di ritorno al posto originale
-  if (!focusedModel.userData.targetPosition) {
-    focusedModel.position.lerp(targetPosition, 0.1);
-  }
-
-  // Se è in fase di ritorno al posto originale (reset)
-  if (focusedModel.userData.targetPosition) {
-  focusedModel.position.lerp(focusedModel.userData.targetPosition, 0.1);
-
-  const distance = focusedModel.position.distanceTo(focusedModel.userData.targetPosition);
-  if (distance < 0.01) {
-    delete focusedModel.userData.targetPosition; // Rimuove la variabile una volta tornato
-  }
-}
   // Lerp della scala
   if (targetScale) {
     focusedModel.scale.lerp(targetScale, 0.1);
@@ -248,28 +234,4 @@ export function updateFocusedModel(camera) {
     }
   }
 }
-
-// Gestione reset da Webflow quando si preme la X
-window.addEventListener("message", function(event) {
-  if (event.data && event.data.type === "resetModel") {
-    const index = event.data.modelIndex;
-    const model = modelsGroup.children.find(
-      (m) => m.userData.modelIndex === index
-    );
-    if (!model) return;
-
-    // Torna alla scala originale
-    const original = modelsData[index];
-    if (original) {
-      targetScale = new THREE.Vector3(original.scale, original.scale, original.scale);
-      focusedModel = model;
-
-      // Imposta posizione target per animazione di ritorno
-      model.userData.targetPosition = new THREE.Vector3(...original.pos);
-    }
-
-    // Nasconde il cono
-    coneTargetOpacity = 0;
-  }
-});
 
