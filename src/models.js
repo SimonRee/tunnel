@@ -216,6 +216,7 @@ export function updateFocusedModel(camera) {
 
   // Se siamo in fase di reset
   if (isResetting && focusedModel.userData.targetPosition) {
+    console.log("Sto resettando il modello");
     // Controlla se il cono è diventato completamente trasparente
     if (fadeCone && fadeCone.material.opacity <= 0.01) {
       // Sposta il modello alla posizione originale
@@ -260,6 +261,7 @@ export function updateFocusedModel(camera) {
 
 //COMUNICAZIONE DEL CLOSE-BUTTON CON WEBFLOW
 window.addEventListener("message", function(event) {
+  console.log("Messaggio ricevuto:", event.data);
   if (event.data && event.data.type === "resetModel") {
     const index = event.data.modelIndex;
     const model = modelsGroup.children.find(
