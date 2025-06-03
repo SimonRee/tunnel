@@ -24,7 +24,7 @@ const finalFov = 40; // valore finale FOV a cui vuoi arrivare
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
 const light = new THREE.AmbientLight(0xffffff, 10); // soft white light
 scene.add(light);
-const PointLight = new THREE.PointLight(0xffffff, 15, 0);
+const PointLight = new THREE.PointLight(0xffffff, 20, 0);
 PointLight.position.set(0, 0, 0);
 scene.add(PointLight);
 const DirL = new THREE.DirectionalLight(0xffffff, 10);

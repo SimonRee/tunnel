@@ -43,7 +43,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       rotY: -15,
     },
     {
-      path: "/models/treno.glb",
+      path: "/models/TrenoHD.glb",
       pos: [-2.12, -0.0, -2.12],
       scale: 0.5,
       rotY: 30,
@@ -63,7 +63,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       material: "metallo",
     },
     {
-      path: "/models/tonno.glb",
+      path: "/models/Tonno.glb",
       pos: [1.15, -0.0, -2.77],
       scale: 0.25,
       rotY: -75,
@@ -98,7 +98,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       rotZ: 0,
     },
     {
-      path: "/models/qholla.glb",
+      path: "/models/Qholla.glb",
       pos: [2.12, -0.0, 2.12],
       scale: 0.3,
       rotY: 150,
@@ -111,6 +111,36 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       rotY: -165,
       rotZ: 0,
     },
+    {
+      path: "/models/Serpente.glb",
+      pos: [0, -0.0, 3],
+      scale: 0.3,
+      rotY: 190,
+      rotZ: 0,
+    },
+    {
+      path: "/models/Microfono.glb",
+      pos: [-1.15, -0.0, 2.77],
+      scale: 0.3,
+      rotY: 205,
+      rotZ: 0,
+      material: "metallo",
+    },
+    {
+      path: "/models/Faro.glb",
+      pos: [-2.12, -0.0, 2.12],
+      scale: 0.3,
+      rotY: -220,
+      rotZ: 0,
+    },
+    {
+      path: "/models/Bilancia.glb",
+      pos: [-2.77, -0.0, 1.15],
+      scale: 0.3,
+      rotY: 235,
+      rotZ: 0,
+    },
+
   ];
 
 //FUNZIONE PER CARICARE I MODELLI
@@ -192,7 +222,7 @@ export function createFadeCone(scene) {
 export function focusModelOnCamera(model) {
   if (focusedModel === model) return; // Se il modello cliccato è già quello attivo, non fare nulla
   focusedModel = model;
-  targetScale = model.scale.clone().multiplyScalar(0.6);
+  targetScale = model.scale.clone().multiplyScalar(0.6);//rimpicciolisce il modello quando lo clicco
 
   // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
