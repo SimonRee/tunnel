@@ -226,6 +226,7 @@ export function focusModelOnCamera(model) {
 
   // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
+    console.log("CANVAS: Ricevuto messaggio", event.data);
     window.parent.postMessage(
       {
         type: "modelClicked",
