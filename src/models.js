@@ -226,15 +226,15 @@ export function focusModelOnCamera(model) {
 
   // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
-    console.log("CANVAS: Ricevuto messaggio", event.data);
-    window.parent.postMessage(
-      {
-        type: "modelClicked",
-        modelIndex: model.userData.modelIndex
-      },
-      "*"
-    );
-  }
+  console.log("CANVAS: invio modelClicked a Webflow con index:", model.userData.modelIndex);
+  window.parent.postMessage(
+    {
+      type: "modelClicked",
+      modelIndex: model.userData.modelIndex
+    },
+    "*"
+  );
+}
 
   // Dopo 1 secondo attiva la transizione del cono
   setTimeout(() => {
