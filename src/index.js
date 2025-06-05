@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
-import { modelsGroup, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
+import { modelsGroup, getFocusedModel, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
@@ -325,7 +325,7 @@ function updateCursorOnHover() {
     document.body.style.cursor = "pointer";
     isHoveringClickable = true;
 
-    if (hoveredModel !== selected) {
+    if (hoveredModel !== selected && selected !== getFocusedModel()) {
       // Reset al target scale di tutti
       getClickableModels().forEach((model, i) => {
         const original = modelsGroup.children[i];
@@ -362,6 +362,7 @@ function updateCursorOnHover() {
 
 function updateHoveredScales() {
   getClickableModels().forEach((model) => {
+  if (model === getFocusedModel()) return; //  Salta lerp su modello cliccato
     if (model.userData.targetScale !== undefined) {
       const current = model.scale.x;
       const target = model.userData.targetScale;

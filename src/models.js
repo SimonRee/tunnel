@@ -206,6 +206,11 @@ export function getClickableModels() {
 
 //per fare l'animazione e spostamento dei modelli
 let focusedModel = null;
+
+export function getFocusedModel() {
+  return focusedModel;
+}
+
 let targetScale = null;
 let fadeCone = null;
 let coneTargetOpacity = 0;
@@ -233,7 +238,7 @@ export function createFadeCone(scene) {
 export function focusModelOnCamera(model) {
   if (focusedModel === model) return; // Se il modello cliccato è già quello attivo, non fare nulla
   focusedModel = model;
-  targetScale = model.scale.clone().multiplyScalar(0.001);//rimpicciolisce il modello quando lo clicco
+  targetScale = model.scale.clone().multiplyScalar(0.4);//rimpicciolisce il modello quando lo clicco
 
   // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
