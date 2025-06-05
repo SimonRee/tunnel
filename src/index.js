@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
-import { modelsGroup, getFocusedModel, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
+import { modelsGroup, getFocusedModel, getIsResetting, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
@@ -312,7 +312,9 @@ window.addEventListener("mousemove", (event) => {
 let isHoveringClickable = false;
 let hoveredModel = null;
 
+//funzione che gestisce il cursore quando si passa sopra i modelli cliccabili
 function updateCursorOnHover() {
+  if (getIsResetting()) return; // Se stai resettando, non fare nulla
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(getClickableModels(), true);
 

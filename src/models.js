@@ -216,7 +216,10 @@ let fadeCone = null;
 let coneTargetOpacity = 0;
 const fadeSpeed = 0.05; // Velocità con cui l'opacità sale
 
-let isResetting = false;//-------------------------------------------------------------
+let isResetting = false;
+export function getIsResetting() {
+  return isResetting;
+}
 let resetStartTime = null;
 
 export function createFadeCone(scene) {
