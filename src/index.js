@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
-import { loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
+import { modelsGroup, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
@@ -22,9 +22,9 @@ const initialFov = 30; // esempio valore iniziale FOV
 const finalFov = 40; // valore finale FOV a cui vuoi arrivare
 
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
-const light = new THREE.AmbientLight(0xffffff, 10); // soft white light
+const light = new THREE.AmbientLight(0xffffff, 50); // soft white light
 scene.add(light);
-const PointLight = new THREE.PointLight(0xffffff, 20, 0);
+const PointLight = new THREE.PointLight(0xffffff, 50, 0);
 PointLight.position.set(0, 0, 0);
 scene.add(PointLight);
 const DirL = new THREE.DirectionalLight(0xffffff, 10);
@@ -101,7 +101,7 @@ for (let i = 0; i <= heightSegments; i++) {
 
 // Creazione del cilindro PIENO PER NON VEDERE IL TUNNEL
 const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4.5,64,1,true);
-const materialPIENO = new THREE.MeshStandardMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});
+const materialPIENO = new THREE.MeshBasicMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});
 const CILINDROPIENO = new THREE.Mesh(cylinderPIENO, materialPIENO);
 scene.add(CILINDROPIENO);
 
@@ -117,7 +117,7 @@ scene.add(tubeMesh);
 // Creazione del wireframe interno (leggermente più piccolo per evitare sovrapposizione)
 const edgesGeo = new THREE.EdgesGeometry(
   new THREE.TubeGeometry(spline, 200, 0.119, 30, false),
-  0.01 //questo valore se lo modifico cambia il numero di segmenti presenti nel tubo
+  0.01 //questo valore se lo modifico cambia il numero di segmenti presenti nel tubo 0.1 
 );
 const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
 const tubeLines = new THREE.LineSegments(edgesGeo, lineMat);
@@ -195,6 +195,37 @@ function updateCameraFov(positionAlongPath) {
   }
 }
 
+// Funzione per aggiornare la nebbia in base alla posizione lungo il percorso
+function updateFog(positionAlongPath) {
+  if (positionAlongPath < 0.28) {
+    // Fog fittissima all'inizio
+    scene.fog.near = 0.01;
+    scene.fog.far = 0.1;
+
+  } else if (positionAlongPath >= 0.28 && positionAlongPath < 0.4) {
+    // Transizione da fog stretta a media
+    let t = (positionAlongPath - 0.28) / 0.1; // da 0 a 1
+    scene.fog.near = THREE.MathUtils.lerp(0.01, 2, t);
+    scene.fog.far = THREE.MathUtils.lerp(0.1, 5, t);
+
+  } else if (positionAlongPath >= 0.4 && positionAlongPath < 0.85) {
+    // Fog stabile media
+    scene.fog.near = 2;
+    scene.fog.far = 5;
+
+  } else if (positionAlongPath >= 0.85 && positionAlongPath < 0.85) {
+    // Transizione da fog media a lontana
+    let t = (positionAlongPath - 0.85) / 0.1; // da 0 a 1
+    scene.fog.near = THREE.MathUtils.lerp(2, 5, t);
+    scene.fog.far = THREE.MathUtils.lerp(5, 20, t);
+
+  } else {
+    // Fog finale molto lontana
+    scene.fog.near = 5;
+    scene.fog.far = 20;
+  }
+}
+
 // Obiettivo finale (parallelo all'asse X)
 const targetQuaternion = new THREE.Quaternion();
 targetQuaternion.setFromEuler(new THREE.Euler(0, 0, 0)); // 90° lungo l'asse Y
@@ -261,6 +292,11 @@ window.addEventListener("click", (event) => {
     while (selected.parent && !getClickableModels().includes(selected)) {
       selected = selected.parent;
     }
+
+    // Reset scala prima del focus. in modo tale che l'hover che ingrandisce non interferisca con il cambio di scala della funzione focusModelOnCamera
+    if (selected.userData.originalScale) {
+      selected.scale.setScalar(selected.userData.originalScale);
+    }
     focusModelOnCamera(selected);
   }
 });
@@ -274,22 +310,65 @@ window.addEventListener("mousemove", (event) => {
 });
 
 let isHoveringClickable = false;
+let hoveredModel = null;
 
 function updateCursorOnHover() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(getClickableModels(), true);
 
   if (intersects.length > 0) {
-    if (!isHoveringClickable) {
-      document.body.style.cursor = "pointer";
-      isHoveringClickable = true;
+    let selected = intersects[0].object;
+    while (selected.parent && !getClickableModels().includes(selected)) {
+      selected = selected.parent;
     }
+
+    document.body.style.cursor = "pointer";
+    isHoveringClickable = true;
+
+    if (hoveredModel !== selected) {
+      // Reset al target scale di tutti
+      getClickableModels().forEach((model, i) => {
+        const original = modelsGroup.children[i];
+        const originalScale = original.userData.originalScale || original.scale.x;
+        model.userData.originalScale = originalScale;
+        model.userData.targetScale = originalScale;
+      });
+
+      // Imposta la nuova scala target solo sul selezionato
+      const base = selected.userData.originalScale || selected.scale.x;
+      selected.userData.originalScale = base;
+      selected.userData.targetScale = base * 1.1;
+
+      hoveredModel = selected;
+    }
+
   } else {
     if (isHoveringClickable) {
       document.body.style.cursor = "default";
       isHoveringClickable = false;
     }
+
+    // Reset della scala target se non stai hoverando nulla
+    getClickableModels().forEach((model, i) => {
+      const original = modelsGroup.children[i];
+      const originalScale = original.userData.originalScale || original.scale.x;
+      model.userData.originalScale = originalScale;
+      model.userData.targetScale = originalScale;
+    });
+
+    hoveredModel = null;
   }
+}
+
+function updateHoveredScales() {
+  getClickableModels().forEach((model) => {
+    if (model.userData.targetScale !== undefined) {
+      const current = model.scale.x;
+      const target = model.userData.targetScale;
+      const newScale = THREE.MathUtils.lerp(current, target, 0.1);
+      model.scale.set(newScale, newScale, newScale);
+    }
+  });
 }
 
 createFadeCone(scene); // Crea il cono inizialmente invisibile che oscura i modelli cliccabili dopo averne cliccato uno
@@ -302,12 +381,16 @@ function animate() {
   updatePlanePosition(positionAlongPath);
   //aggiorna il fov della telecamera pre e post faccia deriansky
   updateCameraFov(positionAlongPath);
+  //aggiorna la nebbia in base alla posizione lungo il percorso
+  updateFog(positionAlongPath);
   //aggiorna posizione e lookAt a fine tunnel
   EndOfTunnel(positionAlongPath);
   //aggiorna il cursore sui modelli cliccabili
   RuotaModels();
   updateCursorOnHover();
   updateFocusedModel(camera);
+  updateHoveredScales();
+  console.log(`Camera Posizione: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}`);
   renderer.render(scene, camera);
   controls.update();
 }

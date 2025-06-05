@@ -29,6 +29,13 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
   clearcoatRoughness: 0.1,
 });
 
+const textureLoader = new THREE.TextureLoader();
+const thermalMatcap = textureLoader.load('/matcap-thermo.png'); 
+
+const termocameraMaterial = new THREE.MeshMatcapMaterial({
+  matcap: thermalMatcap,
+});
+
   const modelsData = [
     {
       path: "/models/Comp.gltf",
@@ -41,6 +48,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       pos: [-2.77, -0.0, -1.15],
       scale: 0.4,
       rotY: -15,
+      material: "termocameraMaterial",
     },
     {
       path: "/models/TrenoHD.glb",
@@ -89,6 +97,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       scale: 0.3,
       rotY: 120,
       rotZ: 0,
+      material: "termocameraMaterial",
     },
     {
       path: "/models/morfeo.glb",
@@ -117,6 +126,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
       scale: 0.3,
       rotY: 190,
       rotZ: 0,
+      material: "termocameraMaterial",
     },
     {
       path: "/models/Microfono.glb",
@@ -159,6 +169,7 @@ export function loadAndPlaceModels(scene) {
           child.receiveShadow = false;
           if (data.material === "vetro") child.material = vetroMaterial;
           if (data.material === "metallo") child.material = metalloMaterial;
+          if (data.material === "termocameraMaterial") child.material = termocameraMaterial;
         }
       });
 
@@ -222,7 +233,7 @@ export function createFadeCone(scene) {
 export function focusModelOnCamera(model) {
   if (focusedModel === model) return; // Se il modello cliccato è già quello attivo, non fare nulla
   focusedModel = model;
-  targetScale = model.scale.clone().multiplyScalar(0.6);//rimpicciolisce il modello quando lo clicco
+  targetScale = model.scale.clone().multiplyScalar(0.001);//rimpicciolisce il modello quando lo clicco
 
   // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
@@ -266,19 +277,21 @@ export function updateFocusedModel(camera) {
     }
 
   } else {
-    // Movimento normale verso la camera
-    const direction = new THREE.Vector3();
-    camera.getWorldDirection(direction);
+  // Movimento verso un punto davanti alla camera, ma con offset in alto a sinistra
+  const offset = new THREE.Vector2(-0.7, 0.3); // x: sinistra, y: alto
+  const offsetPosition = new THREE.Vector3(offset.x, offset.y, 0.5); // z = profondità in clip space
 
-    const targetPosition = new THREE.Vector3()
-      .copy(camera.position)
-      .add(direction.multiplyScalar(1));
+  offsetPosition.unproject(camera); // Trasformazione in world space
 
-    focusedModel.position.lerp(targetPosition, 0.1);
-    if (targetScale) {
-      focusedModel.scale.lerp(targetScale, 0.1);
-    }
+  const dir = offsetPosition.sub(camera.position).normalize();
+  const distance = 1; // distanza dalla camera
+  const targetPosition = camera.position.clone().add(dir.multiplyScalar(distance));
+
+  focusedModel.position.lerp(targetPosition, 0.1);
+  if (targetScale) {
+    focusedModel.scale.lerp(targetScale, 0.1);
   }
+}
 
   // Fading del cono
   if (fadeCone) {
