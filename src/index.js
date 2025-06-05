@@ -22,13 +22,11 @@ const initialFov = 30; // esempio valore iniziale FOV
 const finalFov = 40; // valore finale FOV a cui vuoi arrivare
 
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
-const light = new THREE.AmbientLight(0xffffff, 50); // soft white light
+
+const light = new THREE.AmbientLight(0xffffff, 10); // soft white light
 scene.add(light);
-const PointLight = new THREE.PointLight(0xffffff, 50, 0);
-PointLight.position.set(0, 0, 0);
-scene.add(PointLight);
 const DirL = new THREE.DirectionalLight(0xffffff, 10);
-DirL.position.set(0, 5, 0);
+DirL.position.set(0, 10, 0);
 scene.add(DirL);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -339,7 +337,7 @@ function updateCursorOnHover() {
       // Imposta la nuova scala target solo sul selezionato
       const base = selected.userData.originalScale || selected.scale.x;
       selected.userData.originalScale = base;
-      selected.userData.targetScale = base * 1.1;
+      selected.userData.targetScale = base * 1.3; // Ingrandisce il modello quando hoverato
 
       hoveredModel = selected;
     }

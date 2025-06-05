@@ -5,6 +5,9 @@ const loader = new GLTFLoader();
 const clickableModels = [];
 export const modelsGroup = new THREE.Group(); // Gruppo globale
 
+export const PointLight = new THREE.PointLight(0xffffff, 50, 0);
+PointLight.position.set(0, 0, 0);
+
 //CREAZIONE MATERIALI PER ALCUNI OGGETTI
 
 const vetroMaterial = new THREE.MeshPhysicalMaterial({
@@ -150,11 +153,21 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       rotY: 235,
       rotZ: 0,
     },
+    {
+      path: "/models/Tucano.glb",
+      pos: [-2.84, -0.6, 0.57],
+      scale: 0.3,
+      rotY: 235,
+      rotZ: 0,
+      material: "vetro",
+    },
+
 
   ];
 
 //FUNZIONE PER CARICARE I MODELLI
 export function loadAndPlaceModels(scene) {
+  scene.add(PointLight); //aggiungo qui la point light dichiarata all'inizio così compare effettivamente in index e quindi nel sito
   modelsData.forEach((data, index) => {
     loader.load(data.path, (gltf) => {
       const model = gltf.scene;
@@ -211,6 +224,7 @@ export function getFocusedModel() {
   return focusedModel;
 }
 
+//variabili che servono per le varie funzioni
 let targetScale = null;
 let fadeCone = null;
 let coneTargetOpacity = 0;
@@ -221,6 +235,7 @@ export function getIsResetting() {
   return isResetting;
 }
 let resetStartTime = null;
+
 
 export function createFadeCone(scene) {
   const coneGeometry = new THREE.ConeGeometry(2.5, 3, 64, 1, true); // height = 3, raggio = 2
@@ -262,6 +277,11 @@ export function focusModelOnCamera(model) {
 }
 
 export function updateFocusedModel(camera) {
+  if (focusedModel) { //gestisce il cambio di intenistà della luce quand si clicca su un modello
+  const distanceToLight = focusedModel.position.distanceTo(PointLight.position);
+  const desiredIntensity = THREE.MathUtils.clamp(50 * (distanceToLight / 2.5), 15, 50); // calcolo dinamico
+  PointLight.intensity = THREE.MathUtils.lerp(PointLight.intensity, desiredIntensity, 0.1);
+}
   if (!focusedModel || !camera || !camera.getWorldDirection) return;
 
   // Se siamo in fase di reset
