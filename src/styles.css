@@ -1,9 +1,21 @@
+@font-face {
+  font-family: 'ClashGrotesk-Variable';
+  src: url('/public/Fonts/ClashGrotesk/ClashGrotesk-Variable.woff2') format('woff2'),
+       url('/public/Fonts/ClashGrotesk/ClashGrotesk-Variable.woff') format('woff'),
+       url('/public/Fonts/ClashGrotesk/ClashGrotesk-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+
+
 body {
-  font-family: sans-serif;
+  font-family: ClashGrotesk-Variable, sans-serif;
   display: block;
   margin: 0;
   padding: 0px;
-  height: 100vh
+  height: 100vh;
   width: 100vw;
 }
 
@@ -16,6 +28,7 @@ canvas {
 
 .InformazioniBase {
   transition: opacity 0.5s ease;
+  font-family: ClashGrotesk-Variable, sans-serif;
   margin: 0;
   padding: 0;
   width: 100vw;

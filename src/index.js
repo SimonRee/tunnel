@@ -309,10 +309,22 @@ window.addEventListener("mousemove", (event) => {
 
 let isHoveringClickable = false;
 let hoveredModel = null;
+const nameDiv = document.getElementById("model-name"); // creata una variabile del div per mostrare il nome del modello
 
 //funzione che gestisce il cursore quando si passa sopra i modelli cliccabili
 function updateCursorOnHover() {
   if (getIsResetting()) return; // Se stai resettando, non fare nulla
+
+  // Evita l'hover e il cursore pointer se siamo ancora nel tunnel
+  if (positionAlongPath <= 0.99) {
+    document.body.style.cursor = "default";
+    isHoveringClickable = false;
+    hoveredModel = null;
+    nameDiv.style.opacity = "0";
+    nameDiv.textContent = "";
+    return;
+  }
+
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(getClickableModels(), true);
 
@@ -324,6 +336,10 @@ function updateCursorOnHover() {
 
     document.body.style.cursor = "pointer";
     isHoveringClickable = true;
+
+    // Mostra il nome del modello
+    nameDiv.textContent = selected.userData.name || "Untitled";
+    nameDiv.style.opacity = "1";
 
     if (hoveredModel !== selected && selected !== getFocusedModel()) {
       // Reset al target scale di tutti
@@ -348,6 +364,10 @@ function updateCursorOnHover() {
       isHoveringClickable = false;
     }
 
+    // Nasconde il nome se non c'è hover
+    nameDiv.style.opacity = "0";
+    nameDiv.textContent = "";
+
     // Reset della scala target se non stai hoverando nulla
     getClickableModels().forEach((model, i) => {
       const original = modelsGroup.children[i];
@@ -359,6 +379,8 @@ function updateCursorOnHover() {
     hoveredModel = null;
   }
 }
+
+
 
 function updateHoveredScales() {
   getClickableModels().forEach((model) => {
@@ -391,7 +413,6 @@ function animate() {
   updateCursorOnHover();
   updateFocusedModel(camera);
   updateHoveredScales();
-  console.log(`Camera Posizione: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}`);
   renderer.render(scene, camera);
   controls.update();
 }

@@ -8,67 +8,31 @@
 
   <body>
     <div id="app"></div>
-    <div
-      class="InformazioniBase"
-      style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 1;
-        pointer-events: none;
-      "
-    >
-      <div
-        style="
-          position: absolute;
-          top: 0;
-          left: 0;
-          margin: 0px;
-          color: white;
-          font-family: Helvetica;
-        "
-      >
-        Top Left
-      </div>
-      <div
-        style="
-          position: absolute;
-          top: 0;
-          right: 0;
-          margin: 0px;
-          color: white;
-          font-family: Helvetica;
-        "
-      >
-        Top Right
-      </div>
-      <div
-        style="
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          margin: 0px;
-          color: white;
-          font-family: Helvetica;
-        "
-      >
-        Bottom Left
-      </div>
-      <div
-        style="
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          margin: 0px;
-          color: white;
-          font-family: Helvetica;
-        "
-      >
-        Bottom Right
-      </div>
+    <div class="InformazioniBase" style="position: absolute;top: 0;left: 0;width: 100vw;height: 100vh;z-index: 1;pointer-events: none;">
+      <div style=" position: absolute; top: 0; left: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Top Left</div>
+      <div style="position: absolute; top: 0; right: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Top Right</div>
+      <div style="position: absolute; bottom: 0; left: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Bottom Left</div>
+      <div style="position: absolute; bottom: 0; right: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Bottom Right</div>
     </div>
+
+    <div id="model-name" style="
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 4px;
+      background-color: rgba(0, 0, 0, 1); 
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-family: ClashGrotesk-variable, sans-serif;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+      z-index: 2;">
+    </div>
+
     <!-- chiude il div informazioni base -->
     <script src="src/index.js" type="module"></script>
     <link rel="stylesheet" href="src/styles.css" />

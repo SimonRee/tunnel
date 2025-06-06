@@ -45,6 +45,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       pos: [-3, -0.0, 0],
       scale: 0.25,
       rotY: 0,
+      name: "Computer"
     },
     {
       path: "/models/barca.glb",
@@ -52,12 +53,14 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.4,
       rotY: -15,
       material: "termocameraMaterial",
+      name: "Barca"
     },
     {
       path: "/models/TrenoHD.glb",
       pos: [-2.12, -0.0, -2.12],
       scale: 0.5,
       rotY: 30,
+      name: "Vagone"
     },
     {
       path: "/models/farfalla.glb",
@@ -65,6 +68,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.3,
       rotY: -45,
       material: "vetro",
+      name: "Morpho Menelaus"
     },
     {
       path: "/models/mano.glb",
@@ -72,6 +76,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.3,
       rotY: 60,
       material: "metallo",
+      name: "Spirito"
     },
     {
       path: "/models/Tonno.glb",
@@ -79,6 +84,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.25,
       rotY: -75,
       rotZ: 0,
+      name: "Lattina"
     },
     {
       path: "/models/AsianFake.glb",
@@ -86,6 +92,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.3,
       rotY: 90,
       rotZ: 0,
+      name: "Asian Fake"
     },
     {
       path: "/models/uovo.glb",
@@ -157,12 +164,32 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       path: "/models/Tucano.glb",
       pos: [-2.84, -0.6, 0.57],
       scale: 0.3,
-      rotY: 235,
+      rotY: 250,
       rotZ: 0,
       material: "vetro",
     },
-
-
+    {
+      path: "/models/Cane.glb",
+      pos: [-2.84, 0.6, -0.57],
+      scale: 0.3,
+      rotY: 265,
+      rotZ: 0,
+      material: "vetro",
+    },
+    {
+      path: "/models/Corno.glb",
+      pos: [2.84, -0.6, 0.57],
+      scale: 0.3,
+      rotY: 280,
+      rotZ: 0,
+    },
+    {
+      path: "/models/Flebo.glb",
+      pos: [2.84, -0.6, -0.57],
+      scale: 0.3,
+      rotY: 295,
+      rotZ: 0,
+    },
   ];
 
 //FUNZIONE PER CARICARE I MODELLI
@@ -186,7 +213,8 @@ export function loadAndPlaceModels(scene) {
         }
       });
 
-      model.userData.modelIndex = index; // Serve per collegarlo al div
+      model.userData.modelIndex = index; // Serve per collegarlo al div di webflow
+      model.userData.name = data.name || `Model ${index}`; // Serve per collegarlo al div dei nomi 
       clickableModels.push(model);
       modelsGroup.add(model);
     });
