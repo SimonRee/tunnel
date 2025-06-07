@@ -11,6 +11,7 @@ const mouse = new THREE.Vector2();
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x000000, 0, 100); // se voglio attivare fog nel tunnel devo mettere nel materiale del cilindro e tutti gli oggetti con il paramentro fog: false come ho fatto per il piano della faccia
 
+
 const camera = new THREE.PerspectiveCamera(
   30,
   window.innerWidth / window.innerHeight,
@@ -34,6 +35,22 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//creazione dello skybox con la texture delle linee
+const loader = new THREE.CubeTextureLoader();
+const skyboxTexture = loader.load([
+  '/white.jpg', // px
+  '/white.jpg', // nx
+  '/white.jpg', // py
+  '/white.jpg', // ny
+  '/white.jpg', // pz
+  '/white.jpg',  // nz
+]);
+scene.background = skyboxTexture; // opzionale, se vuoi vedere lo sfondo
+scene.environment = skyboxTexture; // importante per riflessi PBR
+scene.background = null;
+scene.environment = skyboxTexture;
+
+//controlli per la camera
 const controls = new OrbitControls(camera, renderer.domElement);
 
 //IMMAGINE PNG DI DERIANSKY
@@ -63,8 +80,8 @@ const endPosition = new THREE.Vector3(10.52, 7.48, 0.53);
 // Creazione del cilindro wireframe segmentato
 const cylinderRadius = 4;
 const cylinderHeight = 4;
-const radialSegments = 64;
-const heightSegments = 16;
+const radialSegments = 50;
+const heightSegments = 13;
 
 // Creazione del cilindro principale con segmenti verticali
 const cylinderGeo = new THREE.CylinderGeometry(
@@ -86,7 +103,7 @@ scene.add(cylinderLines);
 
 // Aggiunta delle linee orizzontali
 for (let i = 0; i <= heightSegments; i++) {
-  const y = (i / heightSegments - 0.5) * cylinderHeight;
+  const y = (i / heightSegments - 0.5) * cylinderHeight - 0.1; // -0.1 sposta le righe sull'asse Y
   const ringGeo = new THREE.CircleGeometry(cylinderRadius, radialSegments);
   ringGeo.rotateX(Math.PI / 2);
   const ringEdges = new THREE.EdgesGeometry(ringGeo);
@@ -99,7 +116,7 @@ for (let i = 0; i <= heightSegments; i++) {
 }
 
 // Creazione del cilindro PIENO PER NON VEDERE IL TUNNEL
-const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4.5,64,1,true);
+const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4,64,1,true);
 const materialPIENO = new THREE.MeshBasicMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});
 const CILINDROPIENO = new THREE.Mesh(cylinderPIENO, materialPIENO);
 scene.add(CILINDROPIENO);
@@ -384,7 +401,7 @@ function updateCursorOnHover() {
       // Imposta la nuova scala target solo sul selezionato
       const base = selected.userData.originalScale || selected.scale.x;
       selected.userData.originalScale = base;
-      selected.userData.targetScale = base * 1.3; // Ingrandisce il modello quando hoverato
+      selected.userData.targetScale = base * 1.15; // Ingrandisce il modello quando hoverato
 
       hoveredModel = selected;
     }
@@ -449,11 +466,11 @@ const clickableNavs = []; // oggetti cliccabili
 const labelRadius = 3.3;
 
 // Definisci le etichette con angolo e link
-const labelsData = [
-  { text: 'About', angle: Math.PI * 0.1, y: -1.04, link: '/flatfade' }, // basso
-  { text: 'Flatfade', angle: -Math.PI * 0.1, y: -1.04, link: '/about' }, // basso
-  { text: 'Specchio', angle: Math.PI * 0.04, y: 1.04, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
-  { text: 'Psiche', angle: -Math.PI * 0.04, y: 1.04, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
+const labelsData = [//questi dati non modificano nulla, perché le modifiche vanno fatte nella parte responsive
+  { text: 'ABOUT', angle: Math.PI * 0.1, y: -0.97, link: '/flatfade' }, // basso
+  { text: 'FLATFADE', angle: -Math.PI * 0.1, y: -0.97, link: '/about' }, // basso
+  { text: 'SPECCHIO', angle: Math.PI * 0.04, y: 1.06, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
+  { text: 'PSICHE', angle: -Math.PI * 0.04, y: 1.06, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
 ];
 
 labelsData.forEach(data => {
@@ -462,8 +479,8 @@ labelsData.forEach(data => {
   // Troika Text
   const label = new Text();
   label.text = data.text;
-  label.font = "/Fonts/ClashGrotesk/ClashGrotesk-Medium.ttf";
-  label.fontSize = 0.08;
+  label.font = "/Fonts/ClashGrotesk/ClashGrotesk-Regular.ttf";
+  label.fontSize = 0.07;
   label.color = data.text === "Specchio" ? 0xaaaaaa : 0xffffff;
   label.anchorX = 'center';
   label.anchorY = 'middle';
@@ -471,7 +488,7 @@ labelsData.forEach(data => {
   label.sync();
 
   // Sfondo nero
-  const bgGeo = new THREE.PlaneGeometry(0.34, 0.12);
+  const bgGeo = new THREE.PlaneGeometry(0.40, 0.12);
   const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true });
   const bg = new THREE.Mesh(bgGeo, bgMat);
   bg.position.z = -0.01;
@@ -502,9 +519,9 @@ function updateNavLabelAngles() {
     const data = labelsData[index];
     
     // Calcolo nuovo angolo solo se la y è negativa (etichette in basso)
-    let baseAngle = data.text === 'Flatfade' ? Math.PI * 0.1 : 
-                    data.text === 'About' ? -Math.PI * 0.1 :
-                    data.text === 'Psiche' ? Math.PI * 0.04 :
+    let baseAngle = data.text === 'FLATFADE' ? Math.PI * 0.14 : 
+                    data.text === 'ABOUT' ? -Math.PI * 0.14 :
+                    data.text === 'PSICHE' ? Math.PI * 0.04 :
                     -Math.PI * 0.04;
 
     const newAngle = isMobile && data.y < 0 ? baseAngle * 0.6 : baseAngle;
