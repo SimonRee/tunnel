@@ -8,11 +8,24 @@
 
   <body>
     <div id="app"></div>
-    <div class="InformazioniBase" style="position: absolute;top: 0;left: 0;width: 100vw;height: 100vh;z-index: 1;pointer-events: none;">
-      <div style=" position: absolute; top: 0; left: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Top Left</div>
-      <div style="position: absolute; top: 0; right: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Top Right</div>
-      <div style="position: absolute; bottom: 0; left: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Bottom Left</div>
-      <div style="position: absolute; bottom: 0; right: 0; margin: 0px; color: white; font-family: ClashGrotesk-variable, sans-serif;">Bottom Right</div>
+    <div class="InformazioniBase">
+      <div class="info-top-bar">
+        <span style="text-align: left;">FLATFADE<br>2025</span>
+        <span>ESPERIENZA SINESTICA</span>
+        <span>45.4642° N<br>9.1900° E</span>
+        <span style="text-align: right;">PSICHE<br>SPECCHIO<br>ABOUT</span>
+      </div>
+      <div class="info-bottom-left">
+        NOME: DARIO, AKA DERIANSKY <br>
+        ANNO DI NASCITA: 1999 <br>
+        LUOGO DI NASCITA: REGGIO EMILIA <br>
+        PROFESSIONE: RAPPER , PRODUCER 
+      </div>
+      <div class="info-bottom-right">
+        ETICHETTE DISCOGRAFICHE: ASIAN FAKE<br>
+        GENERE MUSICALE: RAP / EXPERIMENTAL / ELECTRO<br>
+        <br>
+        ATTIVITÀ: 14 - ATTUALE</div>
     </div>
 
     <div id="model-name" style="
@@ -32,6 +45,8 @@
       white-space: nowrap;
       z-index: 2;">
     </div>
+
+    <div id="black-fade"></div><!-- Overlay per fare transizione al click dei link -->
 
     <!-- chiude il div informazioni base -->
     <script src="src/index.js" type="module"></script>

@@ -29,7 +29,74 @@ canvas {
 .InformazioniBase {
   transition: opacity 0.5s ease;
   font-family: ClashGrotesk-Variable, sans-serif;
+  font-weight: 320;
   margin: 0;
   padding: 0;
   width: 100vw;
+  color: white;
+  font-size: 1rem;
+}
+
+.info-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-top-bar span {
+  text-align: center;
+  flex-shrink: 0;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-top: 20px;
+}
+
+.info-bottom-left{
+  position: absolute;
+  margin: 0;
+  padding: 15px;
+  text-align: left;
+}
+.info-bottom-right {
+  position: absolute;
+  margin: 0;
+  padding: 15px;
+  text-align: right;
+}
+
+.info-top-left {
+  top: 0;
+  left: 0;
+}
+
+.info-top-right {
+  top: 0;
+  right: 0;
+}
+
+.info-bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+.info-bottom-right {
+  bottom: 0;
+  right: 0;
+}
+
+
+#black-fade {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  z-index: 9999;
 }

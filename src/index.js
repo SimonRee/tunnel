@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
 import { modelsGroup, getFocusedModel, getIsResetting, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
+import { Text } from 'troika-three-text';
 
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
@@ -18,7 +19,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 //FOV della telecamera pre e post faccia deriansky
-const initialFov = 30; // esempio valore iniziale FOV
+const initialFov = 25; // esempio valore iniziale FOV per vedere tutta la faccia è 30
 const finalFov = 40; // valore finale FOV a cui vuoi arrivare
 
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
@@ -129,9 +130,22 @@ let targetPosition = positionAlongPath;
 window.addEventListener(
   "wheel",
   (event) => {
-    if (positionAlongPath > 0.999) return; // Blocca lo scroll alla fine del percorso
-    const delta = event.deltaY > 0 ? 0.01 : -0.01;
-    targetPosition = Math.min(Math.max(targetPosition + delta, 0), 1);
+    if (positionAlongPath > 0.999) return;
+
+    // Determina il moltiplicatore dinamico
+    let multiplier;
+    if (positionAlongPath < 0.3) {
+      multiplier = 0.0007; // più veloce all'inizio
+    } else if (positionAlongPath < 0.8) {
+      multiplier = 0.0002; // velocità normale
+    } else {
+      multiplier = 0.0002; // più veloce verso la fine
+    }
+
+    // Applica la dinamica allo scrollSpeed
+    let scrollSpeed = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) * multiplier, 0.007); // Limita la velocità di scorrimento
+
+    targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
     event.preventDefault();
   },
   { passive: false }
@@ -284,18 +298,35 @@ window.addEventListener("click", (event) => {
 
   raycaster.setFromCamera(mouse, camera);
 
+  // Click su modelli 3D cliccabili
   const intersects = raycaster.intersectObjects(getClickableModels(), true);
   if (intersects.length > 0) {
     let selected = intersects[0].object;
     while (selected.parent && !getClickableModels().includes(selected)) {
       selected = selected.parent;
     }
+    
 
     // Reset scala prima del focus. in modo tale che l'hover che ingrandisce non interferisca con il cambio di scala della funzione focusModelOnCamera
     if (selected.userData.originalScale) {
       selected.scale.setScalar(selected.userData.originalScale);
     }
     focusModelOnCamera(selected);
+    mouse.clicked = true;
+  }
+  
+   // Click su testi della navbar
+  const intersectsNav = raycaster.intersectObjects(clickableNavs, true);
+  if (intersectsNav.length > 0) {
+    let selected = intersectsNav[0].object;
+    while (selected.parent && !clickableNavs.includes(selected)) {
+      selected = selected.parent;
+    }
+
+  const link = selected.userData.link; // questo pezzo fa la transizione al nero e mi porta al nuovo link
+    if (link) {
+    fadeToBlackAndRedirect(link);
+  }
   }
 });
 
@@ -396,6 +427,128 @@ function updateHoveredScales() {
 
 createFadeCone(scene); // Crea il cono inizialmente invisibile che oscura i modelli cliccabili dopo averne cliccato uno
 
+
+
+//fading quando si clicca un link della navbar
+function fadeToBlackAndRedirect(url) {
+  const fadeDiv = document.getElementById("black-fade");
+  fadeDiv.style.pointerEvents = "auto";
+  fadeDiv.style.opacity = "1";
+
+  // Dopo il tempo della transizione, fai il redirect
+  setTimeout(() => {
+    window.location.href = url;
+  }, 1000); // deve combaciare con la transition nel CSS
+}
+
+
+
+//TESTI NAVBAR
+const navLabels = []; // salva tutti i gruppi per l'animazione
+const clickableNavs = []; // oggetti cliccabili
+const labelRadius = 3.3;
+
+// Definisci le etichette con angolo e link
+const labelsData = [
+  { text: 'About', angle: Math.PI * 0.1, y: -1.04, link: '/flatfade' }, // basso
+  { text: 'Flatfade', angle: -Math.PI * 0.1, y: -1.04, link: '/about' }, // basso
+  { text: 'Specchio', angle: Math.PI * 0.04, y: 1.04, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
+  { text: 'Psiche', angle: -Math.PI * 0.04, y: 1.04, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
+];
+
+labelsData.forEach(data => {
+  const group = new THREE.Group();
+
+  // Troika Text
+  const label = new Text();
+  label.text = data.text;
+  label.font = "/Fonts/ClashGrotesk/ClashGrotesk-Medium.ttf";
+  label.fontSize = 0.08;
+  label.color = data.text === "Specchio" ? 0xaaaaaa : 0xffffff;
+  label.anchorX = 'center';
+  label.anchorY = 'middle';
+  label.userData.link = data.link;
+  label.sync();
+
+  // Sfondo nero
+  const bgGeo = new THREE.PlaneGeometry(0.34, 0.12);
+  const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true });
+  const bg = new THREE.Mesh(bgGeo, bgMat);
+  bg.position.z = -0.01;
+
+  group.add(bg);
+  group.add(label);
+
+  // Posizione curva sul cilindro
+  const angle = data.angle;
+  group.userData.originalAngle = angle; // salva l'angolo originale
+  group.position.x = Math.cos(angle) * labelRadius;
+  group.position.z = Math.sin(angle) * labelRadius;
+  group.position.y = data.y;
+
+  group.userData.link = data.link;
+
+  scene.add(group);
+  group.visible = false; // inizialmente invisibili
+  navLabels.push(group);
+  clickableNavs.push(group);
+});
+
+//per rendere responsive le etichette della NavBar
+function updateNavLabelAngles() {
+  const isMobile = window.innerWidth < 768;
+
+  navLabels.forEach((group, index) => {
+    const data = labelsData[index];
+    
+    // Calcolo nuovo angolo solo se la y è negativa (etichette in basso)
+    let baseAngle = data.text === 'Flatfade' ? Math.PI * 0.1 : 
+                    data.text === 'About' ? -Math.PI * 0.1 :
+                    data.text === 'Psiche' ? Math.PI * 0.04 :
+                    -Math.PI * 0.04;
+
+    const newAngle = isMobile && data.y < 0 ? baseAngle * 0.6 : baseAngle;
+
+    data.angle = newAngle;
+    group.userData.originalAngle = newAngle;
+  });
+}
+
+//rendiamo cliccabili le etichette della navbar
+function updateNavInteractions() {
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(clickableNavs, true);
+
+  if (intersects.length > 0) {
+    const hovered = intersects[0].object.parent; // Prendiamo il gruppo
+
+    document.body.style.cursor = "pointer";
+
+    clickableNavs.forEach(group => {
+      const scaleTarget = group === hovered ? 1.1 : 1;
+      group.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), 0.1);
+    });
+
+    // Click handling (solo se è stato cliccato e non solo hoverato)
+    if (mouse.clicked) {
+      const link = hovered.userData.link;
+      if (link) {
+        window.location.href = link;
+      }
+    }
+
+  } else {
+    document.body.style.cursor = "default";
+    clickableNavs.forEach(group => {
+      group.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
+    });
+  }
+  mouse.clicked = false; // Reset dopo il click
+}
+
+
+
+
 //funzione di animazione per gestire le varie funzioni
 function animate() {
   requestAnimationFrame(animate);
@@ -410,6 +563,33 @@ function animate() {
   EndOfTunnel(positionAlongPath);
   //aggiorna il cursore sui modelli cliccabili
   RuotaModels();
+
+  // Calcola l'angolo Y della camera (orientamento orizzontale) fa seguire i label alla camera
+  const cameraQuaternion = camera.quaternion.clone();
+  const euler = new THREE.Euler().setFromQuaternion(cameraQuaternion, 'YXZ');
+  const cameraRotationY = euler.y;
+  // Applica una rotazione inversa alle label per farle "seguire" la camera
+  navLabels.forEach(group => {
+    const angle = group.userData.originalAngle;
+    const radius = labelRadius;
+    const totalAngle = angle - cameraRotationY + Math.PI*1.5 //il meno -cameraRotationY serve per farle ruotare nell'altro senso come con gli orbit controls const totalAngle = angle - cameraRotationY + Math.PI*0.5;
+
+    group.position.x = Math.cos(totalAngle) * radius;
+    group.position.z = Math.sin(totalAngle) * radius;
+
+    group.lookAt(0, group.position.y, 0); // Fa sì che guardino sempre il centro
+  });
+
+  const showNavbar = positionAlongPath > 0.99; //la navbar appare solo dopo il tunnel
+    navLabels.forEach(group => {
+    group.visible = showNavbar;
+  });
+
+  //aggiorna le etichette della navbar in base alla dimensione dello schermo
+  updateNavLabelAngles();
+  //gestione hover e click sulle etichette della navbar
+  updateNavInteractions();
+  //gestione dell'hover e click sui modelli 3D
   updateCursorOnHover();
   updateFocusedModel(camera);
   updateHoveredScales();
@@ -419,8 +599,10 @@ function animate() {
 
 animate();
 
+
 // Resize
 window.addEventListener("resize", () => {
+  updateNavLabelAngles(); //fa resize responsive delle etichette della navbar
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);

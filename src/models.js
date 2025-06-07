@@ -171,7 +171,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
     {
       path: "/models/Cane.glb",
       pos: [-2.84, 0.6, -0.57],
-      scale: 0.3,
+      scale: 0.25,
       rotY: 265,
       rotZ: 0,
       material: "vetro",
@@ -179,14 +179,21 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
     {
       path: "/models/Corno.glb",
       pos: [2.84, -0.6, 0.57],
-      scale: 0.3,
+      scale: 0.4,
       rotY: 280,
       rotZ: 0,
     },
     {
       path: "/models/Flebo.glb",
       pos: [2.84, -0.6, -0.57],
-      scale: 0.3,
+      scale: 0.4,
+      rotY: 295,
+      rotZ: 0,
+    },
+    {
+      path: "/models/TESTA.glb",
+      pos: [-2.50, 0.6, 0.57],
+      scale: 0.2,
       rotY: 295,
       rotZ: 0,
     },

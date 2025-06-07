@@ -14,7 +14,8 @@
   "dependencies": {
     "gsap": "3.13.0",
     "lil-gui": "0.20.0",
-    "three": "0.176.0"
+    "three": "0.176.0",
+    "troika-three-text": "^0.52.4"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
