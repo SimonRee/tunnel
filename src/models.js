@@ -286,7 +286,7 @@ export function createFadeCone(scene) {
 export function focusModelOnCamera(model) {
   if (focusedModel === model) return; // Se il modello cliccato è già quello attivo, non fare nulla
   focusedModel = model;
-  targetScale = model.scale.clone().multiplyScalar(0.4);//rimpicciolisce il modello quando lo clicco
+  targetScale = model.scale.clone().multiplyScalar(0.3);//rimpicciolisce il modello quando lo clicco
 
   // INVIA IL MESSAGGIO AL PARENT (Webflow)
   if (model.userData.modelIndex !== undefined) {
@@ -335,7 +335,7 @@ export function updateFocusedModel(camera) {
     }
 
   } else {
-  // Movimento verso un punto davanti alla camera, ma con offset in alto a sinistra
+  // Movimento verso un punto davanti alla camera, ma con offset in alto a sinistra GESTIRE POSZIONE POST CLICK
   const offset = new THREE.Vector2(-0.7, 0.3); // x: sinistra, y: alto
   const offsetPosition = new THREE.Vector3(offset.x, offset.y, 0.5); // z = profondità in clip space
 

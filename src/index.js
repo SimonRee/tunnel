@@ -65,6 +65,7 @@ const planeGeometry = new THREE.PlaneGeometry(width, height);
 const planeMaterial = new THREE.MeshBasicMaterial({
   map: texture,
   transparent: true,
+  alphaTest: 0.01, // importante per eliminare artefatti ai bordi
   fog: false,
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -115,15 +116,29 @@ for (let i = 0; i <= heightSegments; i++) {
   scene.add(ringLines);
 }
 
-//-------------------------------------------------------------------------------------------------------
 // Geometria del cerchio (raggio 4, 64 segmenti per una forma liscia)
-const circleGeometry = new THREE.CircleGeometry(4, 64);
-const circleMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-const blackCircle = new THREE.Mesh(circleGeometry, circleMaterial);
-blackCircle.rotation.x = -Math.PI / 2;
-scene.add(blackCircle);
-blackCircle.position.set(0, -2.05, 0); // Posiziona il cerchio al centro della scena
+const circleCount = 50;
+const baseY = -1.95; // punto più basso del cilindro
+const stepY = 0.008; // distanza verticale tra i cerchi
+const radius = 4.2;
 
+for (let i = 0; i < circleCount; i++) {
+  const opacity = (i / circleCount) * 0.11; // più in alto = meno opaco
+  const circleGeo = new THREE.CircleGeometry(radius, 16);
+  const circleMat = new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    opacity: opacity,
+    depthWrite: false // evita artefatti visivi
+  });
+
+  const circle = new THREE.Mesh(circleGeo, circleMat);
+  circle.rotation.x = -Math.PI / 2;
+  circle.position.y = baseY + i * stepY;
+  scene.add(circle);
+}
+
+/*
 const ringCount = 6;
 const baseY = -cylinderHeight / 2 + 0.01;
 const radialGroup = new THREE.Group();
@@ -159,11 +174,10 @@ for (let i = 0; i < radialLines; i++) {
 }
 
 scene.add(radialGroup);
-radialGroup.position.set(0, 0.06, 0); // Posiziona il gruppo al centro della scena
+radialGroup.position.set(0, 0.09, 0); // Posiziona il gruppo al centro della scena
 radialGroup.rotation.set(0, Math.PI*0.5, 0); // Ruota il gruppo per allinearlo con l'asse Y
 radialGroup.scale.set(0.965, 0.965, 0.965); // Mantieni la scala originale
-//-------------------------------------------------------------------------------------------------------
-
+*/
 // Creazione del cilindro PIENO PER NON VEDERE IL TUNNEL
 const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4,64,1,true);
 const materialPIENO = new THREE.MeshBasicMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});
@@ -181,7 +195,7 @@ scene.add(tubeMesh);
 
 // Creazione del wireframe interno (leggermente più piccolo per evitare sovrapposizione)
 const edgesGeo = new THREE.EdgesGeometry(
-  new THREE.TubeGeometry(spline, 200, 0.119, 30, false),
+  new THREE.TubeGeometry(spline, 200, 0.119, 30, false), //0.119 per evitare che le linee siano sovrapposte al tubo
   0.01 //questo valore se lo modifico cambia il numero di segmenti presenti nel tubo 0.1 
 );
 const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
@@ -193,25 +207,43 @@ let positionAlongPath = 0;
 let targetPosition = positionAlongPath;
 
 // Gestisci lo scroll del mouse
+let autoScrollFromStart = false; //gestisce inizio tunnel
+let autoScrollToEnd = false;// gestisce fine tunnel
+
 window.addEventListener(
   "wheel",
   (event) => {
-    if (positionAlongPath > 0.999) return;
+    if (positionAlongPath >= 0.9999 || autoScrollToEnd) return;
 
-    // Determina il moltiplicatore dinamico
-    let multiplier;
-    if (positionAlongPath < 0.3) {
-      multiplier = 0.0007; // più veloce all'inizio
-    } else if (positionAlongPath < 0.8) {
-      multiplier = 0.0002; // velocità normale
-    } else {
-      multiplier = 0.0002; // più veloce verso la fine
+    // Trigger iniziale: da 0.1 a 0.35 automatico
+    if (positionAlongPath < 0.35 && !autoScrollFromStart) {
+      autoScrollFromStart = true;
+      targetPosition = 0.35;
+      return;
     }
 
-    // Applica la dinamica allo scrollSpeed
-    let scrollSpeed = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) * multiplier, 0.007); // Limita la velocità di scorrimento
+    // tirgger finale: da 0.8 a 1.0 automatico
+    if (positionAlongPath > 0.8) {
+      autoScrollToEnd = true;
+      // Imposta l'obiettivo finale
+      targetPosition = 1;
 
-    targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
+    } else {
+      // Dinamica normale nelle fasi iniziali
+      let baseMultiplier;
+
+      if (positionAlongPath < 0.3) {
+        baseMultiplier = 0.00005; //GESTISCE IL PRIMISSIMO SCROLL
+      } else if (positionAlongPath < 0.8) {
+        baseMultiplier = 0.0002;
+      } else {
+        baseMultiplier = 0.0002;
+      }
+
+      let scrollSpeed = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) * baseMultiplier, 0.007);
+      targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
+    }
+
     event.preventDefault();
   },
   { passive: false }
@@ -219,13 +251,38 @@ window.addEventListener(
 
 let FinitoTunnel = false; //variabile che controlla l'uscita dal percorso e l'attivazione degli orbit controls
 const desiredLookAt = new THREE.Vector3(-1, 0, 0); //ho dovuto metterlo ANCHE qui oltre che alla riga 211 per eliminare lo scattino che faceva a fine tunnel che guardava inizio splinePrincipale
+
 function updateCamera() {
   if (FinitoTunnel) return; // Ferma aggiornamento automatico
-  positionAlongPath += (targetPosition - positionAlongPath) * 0.1;
+
+  //gestiamo la velocità della camera in base alla posizione lungo il percorso
+
+  let lerpSpeed = 0.1;//velocità della camera dentro il tunnel
+
+  //velocità camera alla fine del tunnel durante l'auto scroll
+  if (autoScrollToEnd && positionAlongPath > 0.8) {
+  const t = (positionAlongPath - 0.8) / (1 - 0.8); // da 0 a 1
+  const easedT = Math.pow(t, 3); // ease-in cubic
+  lerpSpeed = THREE.MathUtils.lerp(0.01, 0.04, easedT); 
+  // parte lento (0.01), poi accelera fino a 0.08
+  } 
+  //velocità camera prima del tunnel durante l'auto scroll
+  else if (autoScrollFromStart && positionAlongPath < 0.35) {
+  const t = positionAlongPath / 0.35; // da 0 a 1
+  const easedT = 1 - Math.pow(1 - t, 3); // ease-out cubic
+  lerpSpeed = THREE.MathUtils.lerp(0.001, 0.05, easedT); 
+  // parte a 0.08 veloce, arriva a 0.015 lento
+  }
+  else if (positionAlongPath >= 0.35 && positionAlongPath < 0.45) {
+  // Transizione graduale tra 0.02 e 0.1
+  lerpSpeed = THREE.MathUtils.lerp(0.02, 0.1, (positionAlongPath - 0.35) / 0.1);
+  }
+  
+  positionAlongPath += (targetPosition - positionAlongPath) * lerpSpeed;
 
   const pos = splinePrincipale.getPointAt(positionAlongPath);
   camera.position.copy(pos);
-
+  
   // Evita il lookAt che guarda indietro a fine tunnel
   if (positionAlongPath < 0.9999) {
     const lookAt = splinePrincipale.getPointAt(
@@ -236,11 +293,12 @@ function updateCamera() {
     camera.lookAt(desiredLookAt);
   }
 }
-//funzione per far muovere faccia di deriansky
+
+//funzione per far MUOVERE FACCIA DERIANSKY
 function updatePlanePosition(positionAlongPath) {
   // Mappa positionAlongPath da [0, 0.1] a [0, 1]
-  let t = THREE.MathUtils.clamp(positionAlongPath / 0.3, 0, 1);
-
+  let t = THREE.MathUtils.clamp(positionAlongPath / 0.35, 0, 1); //0.35 bisogna mettere la positionAlonghPath della transizione iniziale fra 0 e il numero desiderato in questo caso (0.35)
+  t = 1 - Math.pow(1 - t, 3);
   // Interpola tra startPosition e endPosition
   plane.position.lerpVectors(startPosition, endPosition, t);
 
@@ -280,27 +338,27 @@ function updateFog(positionAlongPath) {
     scene.fog.near = 0.01;
     scene.fog.far = 0.1;
 
-  } else if (positionAlongPath >= 0.28 && positionAlongPath < 0.4) {
-    // Transizione da fog stretta a media
-    let t = (positionAlongPath - 0.28) / 0.1; // da 0 a 1
+  } else if (positionAlongPath < 0.4) {
+    // Transizione da fitta a media
+    let t = (positionAlongPath - 0.28) / 0.12;
     scene.fog.near = THREE.MathUtils.lerp(0.01, 2, t);
     scene.fog.far = THREE.MathUtils.lerp(0.1, 5, t);
 
-  } else if (positionAlongPath >= 0.4 && positionAlongPath < 0.85) {
+  } else if (positionAlongPath < 0.85) {
     // Fog stabile media
     scene.fog.near = 2;
     scene.fog.far = 5;
 
-  } else if (positionAlongPath >= 0.85 && positionAlongPath < 0.99) {
-    // Transizione da fog media a lontana
-    let t = (positionAlongPath - 0.85) / 0.1; // da 0 a 1
-    scene.fog.near = THREE.MathUtils.lerp(2, 5, t);
-    scene.fog.far = THREE.MathUtils.lerp(5, 20, t);
-
   } else {
-    // Fog finale molto lontana
-    scene.fog.near = 5;
-    scene.fog.far = 20;
+    // Transizione dolce da fog densa a trasparente (da 0.85 a 1.0)
+    let t = (positionAlongPath - 0.85) / 0.15; // da 0 a 1 tra 0.85 e 1.0
+    t = THREE.MathUtils.clamp(t, 0, 1); // sicurezza
+
+    // Usa easing per una transizione più cinematografica
+    const easeT = t * t * (3 - 2 * t); // easing in-out (smoothstep)
+
+    scene.fog.near = THREE.MathUtils.lerp(0.5, 5, easeT);
+    scene.fog.far = THREE.MathUtils.lerp(1.5, 25, easeT);
   }
 }
 
