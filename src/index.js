@@ -115,6 +115,55 @@ for (let i = 0; i <= heightSegments; i++) {
   scene.add(ringLines);
 }
 
+//-------------------------------------------------------------------------------------------------------
+// Geometria del cerchio (raggio 4, 64 segmenti per una forma liscia)
+const circleGeometry = new THREE.CircleGeometry(4, 64);
+const circleMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+const blackCircle = new THREE.Mesh(circleGeometry, circleMaterial);
+blackCircle.rotation.x = -Math.PI / 2;
+scene.add(blackCircle);
+blackCircle.position.set(0, -2.05, 0); // Posiziona il cerchio al centro della scena
+
+const ringCount = 6;
+const baseY = -cylinderHeight / 2 + 0.01;
+const radialGroup = new THREE.Group();
+
+for (let i = 1; i <= ringCount; i++) {
+  const radius = (cylinderRadius / ringCount) * i;
+  const ringGeo = new THREE.RingGeometry(radius - 0.005, radius + 0.005, 64);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 1,
+    side: THREE.DoubleSide
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = baseY;
+
+  radialGroup.add(ring); // aggiunto al gruppo
+}
+
+const radialLines = 50;
+for (let i = 0; i < radialLines; i++) {
+  const angle = (i / radialLines) * Math.PI * 2;
+  const x = Math.cos(angle) * cylinderRadius;
+  const z = Math.sin(angle) * cylinderRadius;
+
+  const points = [new THREE.Vector3(0, baseY, 0), new THREE.Vector3(x, baseY, z)];
+  const geom = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1 });
+  const line = new THREE.Line(geom, mat);
+
+  radialGroup.add(line); // aggiunto al gruppo
+}
+
+scene.add(radialGroup);
+radialGroup.position.set(0, 0.06, 0); // Posiziona il gruppo al centro della scena
+radialGroup.rotation.set(0, Math.PI*0.5, 0); // Ruota il gruppo per allinearlo con l'asse Y
+radialGroup.scale.set(0.965, 0.965, 0.965); // Mantieni la scala originale
+//-------------------------------------------------------------------------------------------------------
+
 // Creazione del cilindro PIENO PER NON VEDERE IL TUNNEL
 const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4,64,1,true);
 const materialPIENO = new THREE.MeshBasicMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});
@@ -242,7 +291,7 @@ function updateFog(positionAlongPath) {
     scene.fog.near = 2;
     scene.fog.far = 5;
 
-  } else if (positionAlongPath >= 0.85 && positionAlongPath < 0.85) {
+  } else if (positionAlongPath >= 0.85 && positionAlongPath < 0.99) {
     // Transizione da fog media a lontana
     let t = (positionAlongPath - 0.85) / 0.1; // da 0 a 1
     scene.fog.near = THREE.MathUtils.lerp(2, 5, t);
@@ -454,7 +503,7 @@ function fadeToBlackAndRedirect(url) {
 
   // Dopo il tempo della transizione, fai il redirect
   setTimeout(() => {
-    window.location.href = url;
+    window.top.location.href = url;
   }, 1000); // deve combaciare con la transition nel CSS
 }
 
@@ -469,8 +518,8 @@ const labelRadius = 3.3;
 const labelsData = [//questi dati non modificano nulla, perché le modifiche vanno fatte nella parte responsive
   { text: 'ABOUT', angle: Math.PI * 0.1, y: -0.97, link: '/flatfade' }, // basso
   { text: 'FLATFADE', angle: -Math.PI * 0.1, y: -0.97, link: '/about' }, // basso
-  { text: 'SPECCHIO', angle: Math.PI * 0.04, y: 1.06, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
-  { text: 'PSICHE', angle: -Math.PI * 0.04, y: 1.06, link: 'https://www.npmjs.com/package/troika-three-text' }, // alto
+  { text: 'SPECCHIO', angle: Math.PI * 0.04, y: 1.06, link: 'https://it.wikipedia.org/wiki/Pagina_principale' }, // alto
+  { text: 'PSICHE', angle: -Math.PI * 0.04, y: 1.06, link: 'https://it.wikipedia.org/wiki/Pagina_principale' }, // alto
 ];
 
 labelsData.forEach(data => {
@@ -481,9 +530,11 @@ labelsData.forEach(data => {
   label.text = data.text;
   label.font = "/Fonts/ClashGrotesk/ClashGrotesk-Regular.ttf";
   label.fontSize = 0.07;
-  label.color = data.text === "Specchio" ? 0xaaaaaa : 0xffffff;
+  label.color = data.text === "SPECCHIO" ? 0xaaaaaa : 0xffffff;
   label.anchorX = 'center';
   label.anchorY = 'middle';
+  label.outlineWidth = 0.0001; //  0.005 ≈ 1px 
+  label.outlineColor = 0xffffff; // colore del bordo
   label.userData.link = data.link;
   label.sync();
 
@@ -550,7 +601,7 @@ function updateNavInteractions() {
     if (mouse.clicked) {
       const link = hovered.userData.link;
       if (link) {
-        window.location.href = link;
+        window.top.location.href = link;
       }
     }
 
@@ -562,7 +613,6 @@ function updateNavInteractions() {
   }
   mouse.clicked = false; // Reset dopo il click
 }
-
 
 
 
@@ -580,6 +630,7 @@ function animate() {
   EndOfTunnel(positionAlongPath);
   //aggiorna il cursore sui modelli cliccabili
   RuotaModels();
+  
 
   // Calcola l'angolo Y della camera (orientamento orizzontale) fa seguire i label alla camera
   const cameraQuaternion = camera.quaternion.clone();
