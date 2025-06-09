@@ -194,13 +194,65 @@ const tubeMesh = new THREE.Mesh(tubeGeo, wallMat);
 scene.add(tubeMesh);
 
 // Creazione del wireframe interno (leggermente più piccolo per evitare sovrapposizione)
-const edgesGeo = new THREE.EdgesGeometry(
-  new THREE.TubeGeometry(spline, 200, 0.119, 30, false), //0.119 per evitare che le linee siano sovrapposte al tubo
-  0.01 //questo valore se lo modifico cambia il numero di segmenti presenti nel tubo 0.1 
+// --- PARAMETRI ---
+const tubularSegments = 200;
+const radialTubeSegments = 30;
+const tubeRadius = 0.119;
+
+// Geometria leggermente più piccola per evitare sovrapposizione con il tubo nero
+const geo = new THREE.TubeGeometry(spline, tubularSegments, tubeRadius, radialTubeSegments, false);
+const posAttr = geo.attributes.position;
+const customPoints = [];
+
+const ringVertices = radialTubeSegments + 1;
+
+// === LINEE VERTICALI (lungo la spline) ===
+for (let j = 0; j < tubularSegments; j++) {
+  for (let i = 0; i < radialTubeSegments; i++) {
+    const index1 = j * ringVertices + i;
+    const index2 = (j + 1) * ringVertices + i;
+
+    const x1 = posAttr.getX(index1);
+    const y1 = posAttr.getY(index1);
+    const z1 = posAttr.getZ(index1);
+
+    const x2 = posAttr.getX(index2);
+    const y2 = posAttr.getY(index2);
+    const z2 = posAttr.getZ(index2);
+
+    customPoints.push(x1, y1, z1);
+    customPoints.push(x2, y2, z2);
+  }
+}
+
+// === LINEE CIRCOLARI (intorno alla parete del tubo) ===
+for (let j = 0; j <= tubularSegments; j++) {
+  for (let i = 0; i < radialTubeSegments; i++) {
+    const index1 = j * ringVertices + i;
+    const index2 = j * ringVertices + (i + 1);
+
+    const x1 = posAttr.getX(index1);
+    const y1 = posAttr.getY(index1);
+    const z1 = posAttr.getZ(index1);
+
+    const x2 = posAttr.getX(index2);
+    const y2 = posAttr.getY(index2);
+    const z2 = posAttr.getZ(index2);
+
+    customPoints.push(x1, y1, z1);
+    customPoints.push(x2, y2, z2);
+  }
+}
+
+// === GEOMETRIA E LINESEGMENTS ===
+const customGeo = new THREE.BufferGeometry();
+customGeo.setAttribute("position", new THREE.Float32BufferAttribute(customPoints, 3));
+
+const customLines = new THREE.LineSegments(
+  customGeo,
+  new THREE.LineBasicMaterial({ color: 0xffffff })
 );
-const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
-const tubeLines = new THREE.LineSegments(edgesGeo, lineMat);
-scene.add(tubeLines);
+scene.add(customLines);
 
 // Aggiungi una variabile per tenere traccia della posizione lungo il percorso principale
 let positionAlongPath = 0;
@@ -252,6 +304,8 @@ window.addEventListener(
 let FinitoTunnel = false; //variabile che controlla l'uscita dal percorso e l'attivazione degli orbit controls
 const desiredLookAt = new THREE.Vector3(-1, 0, 0); //ho dovuto metterlo ANCHE qui oltre che alla riga 211 per eliminare lo scattino che faceva a fine tunnel che guardava inizio splinePrincipale
 
+
+// Funzione per aggiornare la posizione della camera lungo il percorso
 function updateCamera() {
   if (FinitoTunnel) return; // Ferma aggiornamento automatico
 
@@ -342,12 +396,12 @@ function updateFog(positionAlongPath) {
     // Transizione da fitta a media
     let t = (positionAlongPath - 0.28) / 0.12;
     scene.fog.near = THREE.MathUtils.lerp(0.01, 2, t);
-    scene.fog.far = THREE.MathUtils.lerp(0.1, 5, t);
+    scene.fog.far = THREE.MathUtils.lerp(0.1, 4, t);
 
   } else if (positionAlongPath < 0.85) {
     // Fog stabile media
     scene.fog.near = 2;
-    scene.fog.far = 5;
+    scene.fog.far = 4;
 
   } else {
     // Transizione dolce da fog densa a trasparente (da 0.85 a 1.0)
@@ -640,7 +694,7 @@ function updateNavLabelAngles() {
   });
 }
 
-//rendiamo cliccabili le etichette della navbar
+//rende cliccabili le etichette della navbar
 function updateNavInteractions() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(clickableNavs, true);
@@ -719,6 +773,7 @@ function animate() {
   updateCursorOnHover();
   updateFocusedModel(camera);
   updateHoveredScales();
+  console.log(`Camera position: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}`);
   renderer.render(scene, camera);
   controls.update();
 }
