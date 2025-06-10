@@ -262,6 +262,37 @@ scene.add(customLines);
 let positionAlongPath = 0;
 let targetPosition = positionAlongPath;
 
+
+// Controlla se saltare il tunnel in base al parametro nella URL
+const urlParams = new URLSearchParams(window.location.search);
+const skipTunnel = urlParams.get('skipTunnel') === 'true';
+
+if (skipTunnel) {
+  positionAlongPath = 1;
+  targetPosition = 1;
+  FinitoTunnel = true;
+
+  // Posiziona la camera direttamente alla fine del tunnel
+  const finalPos = splinePrincipale.getPointAt(1);
+  camera.position.copy(finalPos);
+  camera.lookAt(new THREE.Vector3(-1, 0, 0));
+
+  // Attiva i controlli finali
+  controls.enabled = true;
+  controls.enablePan = false;
+  controls.enableZoom = false;
+  controls.minPolarAngle = Math.PI / 2;
+  controls.maxPolarAngle = Math.PI / 2;
+  controls.minAzimuthAngle = -Infinity;
+  controls.maxAzimuthAngle = Infinity;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.rotateSpeed = -0.3;
+
+  console.log("skipTunnel attivo → tunnel saltato, camera alla fine");
+}
+
+
 // Gestisci lo scroll del mouse
 let autoScrollFromStart = false; //gestisce inizio tunnel
 let autoScrollToEnd = false;// gestisce fine tunnel
@@ -513,6 +544,7 @@ window.addEventListener("click", (event) => {
 });
 
 
+
 //CAMBIA POINTER SU OGGETTO CLICCCABILE
 window.addEventListener("mousemove", (event) => {
   const rect = renderer.domElement.getBoundingClientRect();
@@ -632,10 +664,10 @@ const labelRadius = 3.3;
 
 // Definisci le etichette con angolo e link
 const labelsData = [//questi dati non modificano nulla, perché le modifiche vanno fatte nella parte responsive
-  { text: 'ABOUT', angle: Math.PI * 0.1, y: -0.97, link: '/flatfade' }, // basso
-  { text: 'FLATFADE', angle: -Math.PI * 0.1, y: -0.97, link: '/about' }, // basso
-  { text: 'SPECCHIO', angle: Math.PI * 0.04, y: 1.06, link: 'https://it.wikipedia.org/wiki/Pagina_principale' }, // alto
-  { text: 'PSICHE', angle: -Math.PI * 0.04, y: 1.06, link: 'https://it.wikipedia.org/wiki/Pagina_principale' }, // alto
+  { text: 'ABOUT', angle: Math.PI * 0.1, y: -0.97, link: '/about' }, // basso
+  { text: 'FLATFADE', angle: -Math.PI * 0.1, y: -0.97, link: 'https://wddc-groupieml.webflow.io/psiche' }, // basso
+  { text: 'PSICHE', angle: -Math.PI * 0.04, y: 1.06, link: 'https://wddc-groupieml.webflow.io/psiche?skipTunnel=true' }, // alto
+  { text: 'SPECCHIO', angle: Math.PI * 0.04, y: 1.06, link: 'https://wddc-groupieml.webflow.io/specchio' }, // alto
 ];
 
 labelsData.forEach(data => {
@@ -686,10 +718,10 @@ function updateNavLabelAngles() {
     const data = labelsData[index];
     
     // Calcolo nuovo angolo solo se la y è negativa (etichette in basso)
-    let baseAngle = data.text === 'FLATFADE' ? Math.PI * 0.14 : 
-                    data.text === 'ABOUT' ? -Math.PI * 0.14 :
-                    data.text === 'PSICHE' ? Math.PI * 0.04 :
-                    -Math.PI * 0.04;
+    let baseAngle = data.text === 'ABOUT' ? Math.PI * 0.14 : 
+                    data.text === 'FLATFADE' ? -Math.PI * 0.14 :
+                    data.text === 'SPECCHIO' ? Math.PI * 0.04 :
+                    data.text === 'PSICHE' ?-Math.PI * 0.04: 0;
 
     const newAngle = isMobile && data.y < 0 ? baseAngle * 0.6 : baseAngle;
 
