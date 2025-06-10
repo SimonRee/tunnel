@@ -43,7 +43,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
 
   const modelsData = [
     {
-      path: "/models/barca.glb",
+      path: "/models/barca.glb", //index 0
       pos: [3.0, -0.35, 0.0],
       scale: 0.5,
       rotY: -15,
@@ -51,14 +51,63 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       name: "Barca"
     },
     {
-      path: "/models/Qholla.glb",
+      path: "/models/Qholla.glb", // index 1
       pos: [-1.812, -0.3, 2.026],
       scale: 0.35,
       rotY: 30,
       name: "Qholla"
     },
     {
-      path: "/models/farfalla.glb",
+      path: "/models/Tonno.glb", // index 2
+      pos: [-2.754, -0.398, -0.823],
+      scale: 0.35,
+      rotY: -75,
+      rotZ: 0,
+      name: "Lattina"
+    },
+    {
+      path: "/models/Flebo.glb", // index 3
+      pos: [2.126, 0.388, -2.116],
+      scale: 0.5,
+      rotY: 295,
+      rotZ: 0,
+      name: "Aria"
+    },
+    {
+      path: "/models/Microfono.glb", // index 4
+      pos: [-1.525, 0.236, 2.654],
+      scale: 0.4,
+      rotY: 235,
+      rotZ: 0,
+      material: "vetro",
+      name: "Realness"
+    },
+    {
+      path: "/models/Corno.glb", // index 5
+      pos: [-1.383, -0.372, -2.462],
+      scale: 0.35,
+      rotY: 120,
+      rotZ: 0,
+      name: "Trombone"
+    },
+    {
+      path: "/models/Tronco.glb", // index 6
+      pos: [2.973, 0.455, 0.4],
+      scale: 0.25,
+      rotY: 340,
+      rotZ: 0,
+      name: "Legno"
+    },
+    {
+      path: "/models/Faro.glb", // index 7
+      pos: [2.8, 0.4, -0.844],
+      scale: 0.35,
+      rotY: -220,
+      rotZ: 0,
+      name: "Iperuranio"
+    },
+    {
+      path: "/models/farfalla.glb", 
       pos: [0.262, -0.32, -2.989],
       scale: 0.45,
       rotY: -45,
@@ -74,14 +123,6 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       name: "Spirito"
     },
     {
-      path: "/models/Tonno.glb",
-      pos: [-2.754, -0.398, -0.823],
-      scale: 0.35,
-      rotY: -75,
-      rotZ: 0,
-      name: "Lattina"
-    },
-    {
       path: "/models/madonnina.glb",
       pos: [2.531, -0.273, -1.61],
       scale: 0.45,
@@ -94,13 +135,6 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       pos: [-0.6, -0.337, 2.797],
       scale: 0.3,
       rotY: -105,
-      rotZ: 0,
-    },
-    {
-      path: "/models/Corno.glb",
-      pos: [-1.383, -0.372, -2.462],
-      scale: 0.35,
-      rotY: 120,
       rotZ: 0,
     },
     {
@@ -142,22 +176,6 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       material: "metallo",
     },
     {
-      path: "/models/Faro.glb",
-      pos: [2.8, 0.4, -0.844],
-      scale: 0.35,
-      rotY: -220,
-      rotZ: 0,
-    },
-    {
-      path: "/models/Microfono.glb",
-      pos: [-1.525, 0.236, 2.654],
-      scale: 0.4,
-      rotY: 235,
-      rotZ: 0,
-      material: "vetro",
-      name: "Realness"
-    },
-    {
       path: "/models/Bilancia.glb", //andrà sostituita ---------------------------------------------------
       pos: [-0.386, 0.282, -2.975],
       scale: 0.35,
@@ -182,13 +200,6 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       material: "termocameraMaterial",
     },
     {
-      path: "/models/Flebo.glb",
-      pos: [2.126, 0.388, -2.116],
-      scale: 0.5,
-      rotY: 295,
-      rotZ: 0,
-    },
-    {
       path: "/models/Maschera.glb",
       pos: [-0.139, 0.364, 2.997],
       scale: 0.33,
@@ -200,13 +211,6 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       pos: [-1.922, 0.409, -2.303],
       scale: 0.33,
       rotY: 325,
-      rotZ: 0,
-    },
-    {
-      path: "/models/Tronco.glb",
-      pos: [2.973, 0.455, 0.4],
-      scale: 0.25,
-      rotY: 340,
       rotZ: 0,
     },
     /*{

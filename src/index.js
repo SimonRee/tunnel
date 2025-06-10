@@ -263,7 +263,7 @@ let positionAlongPath = 0;
 let targetPosition = positionAlongPath;
 
 
-// Controlla se saltare il tunnel in base al parametro nella URL
+// Controlla se saltare il tunnel in base al parametro nella URL-------------------------------------------non capisco ma qui non funzona, forse perché sta dentro un iframe su webflow ma non so che fare
 const urlParams = new URLSearchParams(window.location.search);
 const skipTunnel = urlParams.get('skipTunnel') === 'true';
 
