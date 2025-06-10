@@ -19,6 +19,10 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
+const cameraWrapper = new THREE.Object3D();
+cameraWrapper.add(camera);
+scene.add(cameraWrapper);
+
 //FOV della telecamera pre e post faccia deriansky
 const initialFov = 25; // esempio valore iniziale FOV per vedere tutta la faccia è 30
 const finalFov = 40; // valore finale FOV a cui vuoi arrivare
@@ -651,7 +655,7 @@ labelsData.forEach(data => {
   label.sync();
 
   // Sfondo nero
-  const bgGeo = new THREE.PlaneGeometry(0.40, 0.12);
+  const bgGeo = new THREE.PlaneGeometry(0.36, 0.12);
   const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true });
   const bg = new THREE.Mesh(bgGeo, bgMat);
   bg.position.z = -0.01;
@@ -742,6 +746,18 @@ function animate() {
   EndOfTunnel(positionAlongPath);
   //aggiorna il cursore sui modelli cliccabili
   RuotaModels();
+
+  //questo in base a dove si trova il cursore fa fare dei tilt alla camera, per togliero ricorda di eliminare anche camera wrapper
+  if (!FinitoTunnel || (FinitoTunnel && controls.enabled)) {
+  const maxTilt = THREE.MathUtils.degToRad(0.05);
+  const targetTiltX = -mouse.y * maxTilt;
+  const targetTiltY = -mouse.x * maxTilt;
+  const targetTiltZ = -mouse.y * maxTilt;
+
+  cameraWrapper.rotation.x = THREE.MathUtils.lerp(cameraWrapper.rotation.x, targetTiltX, 0.03);
+  cameraWrapper.rotation.y = THREE.MathUtils.lerp(cameraWrapper.rotation.y, targetTiltY, 0.03);
+  cameraWrapper.rotation.z = THREE.MathUtils.lerp(cameraWrapper.rotation.z, targetTiltZ, 0.03);
+  }
   
 
   // Calcola l'angolo Y della camera (orientamento orizzontale) fa seguire i label alla camera

@@ -44,7 +44,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
   const modelsData = [
     {
       path: "/models/barca.glb",
-      pos: [3.0, -0.3, 0.0],
+      pos: [3.0, -0.35, 0.0],
       scale: 0.5,
       rotY: -15,
       material: "termocameraMaterial",
@@ -66,8 +66,8 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       name: "Morpho Menelaus"
     },
     {
-      path: "/models/mano.glb",
-      pos: [1.825, -0.364, 2.381],
+      path: "/models/mano.glb",//andrà sostituita ---------------------------------------------------
+      pos: [1.725, -0.4, 2.45],
       scale: 0.4,
       rotY: 60,
       material: "metallo",
@@ -82,9 +82,9 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       name: "Lattina"
     },
     {
-      path: "/models/AsianFake.glb",
+      path: "/models/madonnina.glb",
       pos: [2.531, -0.273, -1.61],
-      scale: 0.4,
+      scale: 0.45,
       rotY: 90,
       rotZ: 0,
       name: "Asian Fake"
@@ -98,7 +98,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
     },
     {
       path: "/models/Corno.glb",
-      pos: [-1.383, -0.232, -2.462],
+      pos: [-1.383, -0.372, -2.462],
       scale: 0.35,
       rotY: 120,
       rotZ: 0,
@@ -112,10 +112,11 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
     },
     {
       path: "/models/TrenoHD.glb",
-      pos: [-2.773, -0.25, 0.945],
-      scale: 0.5,
+      pos: [-2.773, -0.25, 1.345],
+      scale: 0.55,
       rotY: 150,
       rotZ: 0,
+      name: "Vagone"
     },
     {
       path: "/models/sirena.glb",
@@ -125,7 +126,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       rotZ: 0,
     },
     {
-      path: "/models/Serpente.glb",
+      path: "/models/serpente.glb",
       pos: [0.898, 0.0, 2.862],
       scale: 0.4,
       rotY: 190,
@@ -142,7 +143,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
     },
     {
       path: "/models/Faro.glb",
-      pos: [2.8, 0.3, -0.844],
+      pos: [2.8, 0.4, -0.844],
       scale: 0.35,
       rotY: -220,
       rotZ: 0,
@@ -154,9 +155,10 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       rotY: 235,
       rotZ: 0,
       material: "vetro",
+      name: "Realness"
     },
     {
-      path: "/models/Bilancia.glb",
+      path: "/models/Bilancia.glb", //andrà sostituita ---------------------------------------------------
       pos: [-0.386, 0.282, -2.975],
       scale: 0.35,
       rotY: 250,
@@ -164,16 +166,17 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
     },
     {
       path: "/models/Cane.glb",
-      pos: [2.294, 0.36, 1.933],
+      pos: [1.994, 0.4, 2.300],
       scale: 0.35,
       rotY: 265,
       rotZ: 0,
       material: "vetro",
+      name: "Mastino"
     },
     {
       path: "/models/reliquia.glb",
       pos: [-2.997, 0.373, 0.124],
-      scale: 0.4,
+      scale: 0.45,
       rotY: 280,
       rotZ: 0,
       material: "termocameraMaterial",
@@ -186,12 +189,33 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       rotZ: 0,
     },
     {
-      path: "/models/TESTA.glb",
+      path: "/models/Maschera.glb",
       pos: [-0.139, 0.364, 2.997],
       scale: 0.33,
-      rotY: 295,
+      rotY: 310,
       rotZ: 0,
     },
+    {
+      path: "/models/Cervello.glb",
+      pos: [-1.922, 0.409, -2.303],
+      scale: 0.33,
+      rotY: 325,
+      rotZ: 0,
+    },
+    {
+      path: "/models/Tronco.glb",
+      pos: [2.973, 0.455, 0.4],
+      scale: 0.25,
+      rotY: 340,
+      rotZ: 0,
+    },
+    /*{
+      path: "/models/Tronco.glb",
+      pos: [-2.463, 0.5, 1.713],
+      scale: 0.25,
+      rotY: 355,
+      rotZ: 0,
+    },*/ //manca un modello, le coordinate sono giuste
   ];
 
 //FUNZIONE PER CARICARE I MODELLI
@@ -208,7 +232,7 @@ export function loadAndPlaceModels(scene) {
       model.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = false;
-          child.receiveShadow = false;
+          child.receiveShadow = false; 
           if (data.material === "vetro") child.material = vetroMaterial;
           if (data.material === "metallo") child.material = metalloMaterial;
           if (data.material === "termocameraMaterial") child.material = termocameraMaterial;
