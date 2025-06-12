@@ -819,7 +819,6 @@ function animate() {
   updateCursorOnHover();
   updateFocusedModel(camera);
   updateHoveredScales();
-  console.log(`Camera position: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}`);
   renderer.render(scene, camera);
   controls.update();
 }
