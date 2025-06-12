@@ -263,34 +263,31 @@ let positionAlongPath = 0;
 let targetPosition = positionAlongPath;
 
 
-// Controlla se saltare il tunnel in base al parametro nella URL-------------------------------------------non capisco ma qui non funzona, forse perché sta dentro un iframe su webflow ma non so che fare
-const urlParams = new URLSearchParams(window.location.search);
-const skipTunnel = urlParams.get('skipTunnel') === 'true';
+// RICEVE MESSAGGIO DA WEBFLOW PER SALTARE IL TUNNEL
+window.addEventListener("message", function(event) {
+  if (event.data && event.data.type === "skipTunnel") {
+    positionAlongPath = 1;
+    targetPosition = 1;
+    FinitoTunnel = true;
 
-if (skipTunnel) {
-  positionAlongPath = 1;
-  targetPosition = 1;
-  FinitoTunnel = true;
+    const finalPos = splinePrincipale.getPointAt(1);
+    camera.position.copy(finalPos);
+    camera.lookAt(new THREE.Vector3(-1, 0, 0));
 
-  // Posiziona la camera direttamente alla fine del tunnel
-  const finalPos = splinePrincipale.getPointAt(1);
-  camera.position.copy(finalPos);
-  camera.lookAt(new THREE.Vector3(-1, 0, 0));
+    controls.enabled = true;
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.minPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.minAzimuthAngle = -Infinity;
+    controls.maxAzimuthAngle = Infinity;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.rotateSpeed = -0.3;
 
-  // Attiva i controlli finali
-  controls.enabled = true;
-  controls.enablePan = false;
-  controls.enableZoom = false;
-  controls.minPolarAngle = Math.PI / 2;
-  controls.maxPolarAngle = Math.PI / 2;
-  controls.minAzimuthAngle = -Infinity;
-  controls.maxAzimuthAngle = Infinity;
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-  controls.rotateSpeed = -0.3;
-
-  console.log("skipTunnel attivo → tunnel saltato, camera alla fine");
-}
+    console.log("Messaggio ricevuto da Webflow: skipTunnel → salto tunnel");
+  }
+});
 
 
 // Gestisci lo scroll del mouse
@@ -503,8 +500,36 @@ function EndOfTunnel(positionAlongPath) {
   }
 }
 
+
+//variabili per sistemare errore nel drag che attiva anche gli oggetti cliccabili passandoci sopra
+let mouseDownPos = new THREE.Vector2();
+let isDragging = false;
+
+// Gestione del mouse per il drag per evitare che il click attivi anche gli oggetti cliccabili quando si fa drag
+window.addEventListener("mousedown", (event) => {
+  mouseDownPos.set(event.clientX, event.clientY);
+  isDragging = false;
+});
+
+window.addEventListener("mousemove", (event) => {
+  const dx = event.clientX - mouseDownPos.x;
+  const dy = event.clientY - mouseDownPos.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > 5) {
+    isDragging = true;
+  }
+});
+
+
 //RENDE OGGETTI CLICCABILI
 window.addEventListener("click", (event) => {
+
+  if (isDragging) {
+    mouse.clicked = false;
+    return; // blocca il click se era un drag, aggiunto per evitare che il click attivi anche gli oggetti cliccabili quando si fa drag
+  }
+
   const rect = renderer.domElement.getBoundingClientRect();
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -812,7 +837,7 @@ function animate() {
     navLabels.forEach(group => {
     group.visible = showNavbar;
   });
-
+  
   //aggiorna le etichette della navbar in base alla dimensione dello schermo
   updateNavLabelAngles();
   //gestione hover e click sulle etichette della navbar

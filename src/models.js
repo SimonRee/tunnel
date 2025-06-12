@@ -6,9 +6,10 @@ const clickableModels = [];
 export const modelsGroup = new THREE.Group(); // Gruppo globale
 
 export const PointLight = new THREE.PointLight(0xffffff, 50, 0);
-PointLight.position.set(0, 0, 0);
+PointLight.position.set(0, 1, 0);
 
 //CREAZIONE MATERIALI PER ALCUNI OGGETTI
+
 
 const vetroMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
@@ -34,12 +35,29 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
   envMapIntensity: 5 //intenistà della riflessione della mappa cubica che c'è in index
 });
 
+const textureLoaderRuggine = new THREE.TextureLoader();
+const rustTexture = textureLoaderRuggine.load('/ruggine.png');
+const metalloArrugginito = new THREE.MeshPhysicalMaterial({
+  color: 0xd0d0d0,
+  metalness: 0.0,
+  roughness: 1.0,
+  color: 0x3b332d, // Colore marrone per la ruggine
+  reflectivity: 0.0,
+  clearcoat: 0.0,
+  clearcoatRoughness: 0.0,
+  envMapIntensity: 1,
+  map: rustTexture // Applica la texture di ruggine come diffuse map
+});
+
+//materiale termocamera
 const textureLoader = new THREE.TextureLoader();
 const thermalMatcap = textureLoader.load('/matcap-thermo.png'); 
 
 const termocameraMaterial = new THREE.MeshMatcapMaterial({
   matcap: thermalMatcap,
+
 });
+
 
   const modelsData = [
     {
@@ -48,22 +66,23 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.5,
       rotY: -15,
       material: "termocameraMaterial",
-      name: "Barca"
+      name: "BARCA"
     },
     {
       path: "/models/Qholla.glb", // index 1
       pos: [-1.812, -0.3, 2.026],
       scale: 0.35,
       rotY: 30,
-      name: "Qholla"
+      name: "QHOLLA",
+      material: "crtMaterial", // Aggiunto materiale vetro
     },
     {
-      path: "/models/Tonno.glb", // index 2
+      path: "/models/tonnino.glb", // index 2
       pos: [-2.754, -0.398, -0.823],
       scale: 0.35,
       rotY: -75,
       rotZ: 0,
-      name: "Lattina"
+      name: "LATTINA"
     },
     {
       path: "/models/Flebo.glb", // index 3
@@ -71,7 +90,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.5,
       rotY: 295,
       rotZ: 0,
-      name: "Aria"
+      name: "ARIA"
     },
     {
       path: "/models/Microfono.glb", // index 4
@@ -80,15 +99,16 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       rotY: 235,
       rotZ: 0,
       material: "vetro",
-      name: "Realness"
+      name: "REALNESS"
     },
     {
-      path: "/models/Corno.glb", // index 5
+      path: "/models/Cinepresa.glb", // index 5
       pos: [-1.383, -0.372, -2.462],
-      scale: 0.35,
+      scale: 0.08,
       rotY: 120,
       rotZ: 0,
-      name: "Trombone"
+      material: "Arrugginito",
+      name: "TROMBONE"
     },
     {
       path: "/models/Tronco.glb", // index 6
@@ -96,7 +116,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.25,
       rotY: 340,
       rotZ: 0,
-      name: "Legno"
+      name: "LEGNO"
     },
     {
       path: "/models/Faro.glb", // index 7
@@ -104,7 +124,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.35,
       rotY: -220,
       rotZ: 0,
-      name: "Iperuranio"
+      name: "IPERURANIO"
     },
     {
       path: "/models/farfalla.glb", 
@@ -112,7 +132,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.45,
       rotY: -45,
       material: "vetro",
-      name: "Morpho Menelaus"
+      name: "MORPHO MENELAUS"
     },
     {
       path: "/models/mano.glb",//andrà sostituita ---------------------------------------------------
@@ -120,7 +140,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.4,
       rotY: 60,
       material: "metallo",
-      name: "Spirito"
+      name: "SPIRITO"
     },
     {
       path: "/models/madonnina.glb",
@@ -128,7 +148,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.45,
       rotY: 90,
       rotZ: 0,
-      name: "Asian Fake"
+      name: "ASIAN"
     },
     {
       path: "/models/uovo.glb",
@@ -240,6 +260,8 @@ export function loadAndPlaceModels(scene) {
           if (data.material === "vetro") child.material = vetroMaterial;
           if (data.material === "metallo") child.material = metalloMaterial;
           if (data.material === "termocameraMaterial") child.material = termocameraMaterial;
+          if (data.material === "Arrugginito") child.material = metalloArrugginito; // Aggiunto materiale metallo arrugginito
+          
         }
       });
 
