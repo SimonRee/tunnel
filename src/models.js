@@ -35,6 +35,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
   envMapIntensity: 5 //intenistà della riflessione della mappa cubica che c'è in index
 });
 
+//materiale metallo arrugginito
 const textureLoaderRuggine = new THREE.TextureLoader();
 const rustTexture = textureLoaderRuggine.load('/ruggine.png');
 const metalloArrugginito = new THREE.MeshPhysicalMaterial({
@@ -43,8 +44,8 @@ const metalloArrugginito = new THREE.MeshPhysicalMaterial({
   roughness: 1.0,
   color: 0x3b332d, // Colore marrone per la ruggine
   reflectivity: 0.0,
-  clearcoat: 0.0,
-  clearcoatRoughness: 0.0,
+  clearcoat: 0.1,
+  clearcoatRoughness: 1.0,
   envMapIntensity: 1,
   map: rustTexture // Applica la texture di ruggine come diffuse map
 });
@@ -58,6 +59,34 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
 
 });
 
+//materiale MORFEO
+const textureLoaderMorfeo = new THREE.TextureLoader();
+const plasticaMorfeo = textureLoaderMorfeo.load('/plasticaMorfeo.png'); 
+
+const plastica = new THREE.MeshMatcapMaterial({
+  matcap: plasticaMorfeo,
+
+});
+
+//materiale TEAMCRO
+const textureLoaderTEAMCRO = new THREE.TextureLoader();
+
+const colorMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/color.jpg');
+colorMapTEAMCRO.encoding = THREE.sRGBEncoding;
+const normalMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/normal.exr');
+const roughnessMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/roughness.jpg');
+const displacementMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/displacement.png'); // opzionale
+
+const rockMaterial = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0x292929), // tono più scuro
+  map: colorMapTEAMCRO,
+  normalMap: normalMapTEAMCRO,
+  roughnessMap: roughnessMapTEAMCRO,
+  displacementMap: displacementMapTEAMCRO,
+  displacementScale: 0.03, // solo se hai una geometria ad alta suddivisione
+  roughness: 0.8, // maggiore ruvidezza per un aspetto più roccioso
+  metalness: 0.0, // roccia non metallica
+});
 
   const modelsData = [
     {
@@ -74,7 +103,6 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       scale: 0.35,
       rotY: 30,
       name: "QHOLLA",
-      material: "crtMaterial", // Aggiunto materiale vetro
     },
     {
       path: "/models/tonnino.glb", // index 2
@@ -127,7 +155,33 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       name: "IPERURANIO"
     },
     {
-      path: "/models/farfalla.glb", 
+      path: "/models/serpente.glb", // index 8
+      pos: [0.898, 0.0, 2.862],
+      scale: 0.45,
+      rotY: 190,
+      rotZ: 0,
+      material: "termocameraMaterial",
+      name: "MUTA"
+    },
+    {
+      path: "/models/reliquia.glb", // index 9
+      pos: [-2.997, 0.373, 0.124],
+      scale: 0.45,
+      rotY: 280,
+      rotZ: 0,
+      material: "termocameraMaterial",
+      name: "SPIRITO"
+    },
+    {
+      path: "/models/madonnina.glb", // index 10
+      pos: [2.531, -0.273, -1.61],
+      scale: 0.45,
+      rotY: 90,
+      rotZ: 0,
+      name: "ASIAN FAKE"
+    },
+    {
+      path: "/models/farfalla.glb", // index 11
       pos: [0.262, -0.32, -2.989],
       scale: 0.45,
       rotY: -45,
@@ -135,111 +189,103 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
       name: "MORPHO MENELAUS"
     },
     {
-      path: "/models/mano.glb",//andrà sostituita ---------------------------------------------------
-      pos: [1.725, -0.4, 2.45],
-      scale: 0.4,
-      rotY: 60,
-      material: "metallo",
-      name: "SPIRITO"
-    },
-    {
-      path: "/models/madonnina.glb",
-      pos: [2.531, -0.273, -1.61],
-      scale: 0.45,
-      rotY: 90,
-      rotZ: 0,
-      name: "ASIAN"
-    },
-    {
-      path: "/models/uovo.glb",
-      pos: [-0.6, -0.337, 2.797],
-      scale: 0.3,
-      rotY: -105,
-      rotZ: 0,
-    },
-    {
-      path: "/models/morfeo.glb",
-      pos: [2.818, -0.136, 1.329],
-      scale: 0.4,
-      rotY: -135,
-      rotZ: 0,
-    },
-    {
-      path: "/models/TrenoHD.glb",
-      pos: [-2.773, -0.25, 1.345],
-      scale: 0.55,
-      rotY: 150,
-      rotZ: 0,
-      name: "Vagone"
-    },
-    {
-      path: "/models/sirena.glb",
-      pos: [1.272, -0.045, -2.717],
-      scale: 0.25,
-      rotY: -165,
-      rotZ: 0,
-    },
-    {
-      path: "/models/serpente.glb",
-      pos: [0.898, 0.0, 2.862],
-      scale: 0.4,
-      rotY: 190,
-      rotZ: 0,
-      material: "termocameraMaterial",
-    },
-    {
-      path: "/models/Tucano.glb",
-      pos: [-2.596, 0.25, -1.504],
-      scale: 0.35,
-      rotY: 205,
-      rotZ: 0,
-      material: "metallo",
-    },
-    {
-      path: "/models/Bilancia.glb", //andrà sostituita ---------------------------------------------------
-      pos: [-0.386, 0.282, -2.975],
-      scale: 0.35,
-      rotY: 250,
-      rotZ: 0,
-    },
-    {
-      path: "/models/Cane.glb",
+      path: "/models/Cane.glb", // index 12
       pos: [1.994, 0.4, 2.300],
       scale: 0.35,
       rotY: 265,
       rotZ: 0,
       material: "vetro",
-      name: "Mastino"
+      name: "MASTINO"
     },
     {
-      path: "/models/reliquia.glb",
-      pos: [-2.997, 0.373, 0.124],
-      scale: 0.45,
-      rotY: 280,
+      path: "/models/TrenoHD.glb", // index 13
+      pos: [-2.773, -0.25, 1.345],
+      scale: 0.55,
+      rotY: 150,
       rotZ: 0,
-      material: "termocameraMaterial",
+      name: "VAGONE",
     },
     {
-      path: "/models/Maschera.glb",
+      path: "/models/mano.glb",//andrà sostituita ---CON PARMA----------- INDEX 14
+      pos: [1.725, -0.4, 2.45],
+      scale: 0.4,
+      rotY: 60,
+      material: "metallo",
+      name: "43123",
+    },
+    {
+      path: "/models/Tucano.glb", // index 15
+      pos: [-2.596, 0.25, -1.504],
+      scale: 0.38,
+      rotY: 205,
+      rotZ: 0,
+      material: "metallo",
+      name: "TUCANO",
+    },
+    {
+      path: "/models/Maschera.glb", // index 16
       pos: [-0.139, 0.364, 2.997],
       scale: 0.33,
       rotY: 310,
       rotZ: 0,
+      name: "FLATFACE",
     },
     {
-      path: "/models/Cervello.glb",
+      path: "/models/morfeo.glb", // index 17
+      pos: [2.818, -0.136, 1.329],
+      scale: 0.4,
+      rotY: -135,
+      rotZ: 0,
+      material: "plastica",
+      name: "MORFEO",
+    },
+    {
+      path: "/models/Cervello.glb", // index 18
       pos: [-1.922, 0.409, -2.303],
       scale: 0.33,
       rotY: 325,
       rotZ: 0,
+      name: "INTIMO",
     },
-    /*{
-      path: "/models/Tronco.glb",
-      pos: [-2.463, 0.5, 1.713],
+    {
+      path: "/models/uovo.glb", // index 19
+      pos: [-0.6, -0.337, 2.797],
+      scale: 0.3,
+      rotY: -105,
+      rotZ: 0,
+      name: "LOOP",
+    },
+    {
+      path: "/models/sirena.glb", // index 20
+      pos: [1.272, -0.045, -2.717],
       scale: 0.25,
+      rotY: -165,
+      rotZ: 0,
+      name: "INPUT",
+    },
+    {
+      path: "/models/squadra.glb", // index 21 
+      pos: [-2.463, 0.5, 1.713],
+      scale: 1.8,
       rotY: 355,
       rotZ: 0,
-    },*/ //manca un modello, le coordinate sono giuste
+      material: "rockMaterial",
+      name: "SQUADRA",
+    },
+    {
+      path: "/models/Nido.glb", // index 22
+      pos: [-0.586, 0.282, -2.775],
+      scale: 0.3,
+      rotY: -250,
+      rotZ: 0,
+      name: "DOMANI",
+      material: "metallo",
+    },
+    
+    
+    
+    
+    
   ];
 
 //FUNZIONE PER CARICARE I MODELLI
@@ -261,7 +307,8 @@ export function loadAndPlaceModels(scene) {
           if (data.material === "metallo") child.material = metalloMaterial;
           if (data.material === "termocameraMaterial") child.material = termocameraMaterial;
           if (data.material === "Arrugginito") child.material = metalloArrugginito; // Aggiunto materiale metallo arrugginito
-          
+          if (data.material === "plastica") child.material = plastica; // Aggiunto materiale plastica
+          if (data.material === "rockMaterial") child.material = rockMaterial; // Aggiunto materiale roccia
         }
       });
 
@@ -386,7 +433,7 @@ export function updateFocusedModel(camera) {
 
   } else {
   // Movimento verso un punto davanti alla camera, ma con offset in alto a sinistra GESTIRE POSZIONE POST CLICK
-  const offset = new THREE.Vector2(-0.7, 0.3); // x: sinistra, y: alto
+  const offset = new THREE.Vector2(-0.7, 0.25); // -x: sinistra, +y: alto
   const offsetPosition = new THREE.Vector3(offset.x, offset.y, 0.5); // z = profondità in clip space
 
   offsetPosition.unproject(camera); // Trasformazione in world space
