@@ -2,9 +2,38 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
-import { modelsGroup, getFocusedModel, getIsResetting, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
+import { modelsGroup, getFocusedModel, getIsResetting, setLoadingManager, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 import { Text } from 'troika-three-text';
 
+//GESTIRE IL LOADER DELLA PAGINAAAA
+const loadingScreen = document.getElementById("loading-screen");
+
+const manager = new THREE.LoadingManager();
+
+manager.onStart = (url, itemsLoaded, itemsTotal) => {
+  console.log(`INIZIO: Sto caricando ${url}. ${itemsLoaded}/${itemsTotal}`);
+};
+
+manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  console.log(`PROGRESSO: Caricato ${url}. ${itemsLoaded}/${itemsTotal}`);
+};
+
+// Quando tutto è caricato
+manager.onLoad = () => {
+  console.log("Tutte le risorse sono state caricate.");
+  loadingScreen.style.opacity = "0";
+  setTimeout(() => {
+    loadingScreen.style.display = "none";
+  }, 1000); // matcha con il transition
+};
+
+manager.onError = (url) => {
+  console.error(`❌ Errore nel caricamento di ${url}`);
+};
+
+setLoadingManager(manager);
+
+//INIZIALIZZA IL RAYCASTER PER POTER CLICCARE SUGLI OGGETTI
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
 
@@ -29,18 +58,32 @@ const finalFov = 40; // valore finale FOV a cui vuoi arrivare
 
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
 
-const light = new THREE.AmbientLight(0xffffff, 10); // soft white light
+
+//LUCI
+const light = new THREE.AmbientLight(0xffffff, 0.3); // soft white light
 scene.add(light);
-const DirL = new THREE.DirectionalLight(0xffffff, 10);
-DirL.position.set(0, 10, 0);
-scene.add(DirL);
+
+// 2. Hemisphere light
+const hemi = new THREE.HemisphereLight(0xffffff, 0x111122, 3.5);
+scene.add(hemi);
+
+// 3. Directional cinematic
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+keyLight.position.set(5, 10, 5);
+keyLight.castShadow = true;
+scene.add(keyLight);
+
+// 4. Rim light soft
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
+rimLight.position.set(-3, 2, -5);
+scene.add(rimLight);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 //creazione dello skybox con la texture delle linee
-const loader = new THREE.CubeTextureLoader();
+const loader = new THREE.CubeTextureLoader(manager);
 const skyboxTexture = loader.load([
   '/white.jpg', // px
   '/white.jpg', // nx
@@ -59,7 +102,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 //IMMAGINE PNG DI DERIANSKY
 // Caricamento della texture PNG
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new THREE.TextureLoader(manager);
 const texture = textureLoader.load("/DERIO.png");
 
 // Creazione del piano 16:9
@@ -142,46 +185,7 @@ for (let i = 0; i < circleCount; i++) {
   scene.add(circle);
 }
 
-/*
-const ringCount = 6;
-const baseY = -cylinderHeight / 2 + 0.01;
-const radialGroup = new THREE.Group();
 
-for (let i = 1; i <= ringCount; i++) {
-  const radius = (cylinderRadius / ringCount) * i;
-  const ringGeo = new THREE.RingGeometry(radius - 0.005, radius + 0.005, 64);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 1,
-    side: THREE.DoubleSide
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.y = baseY;
-
-  radialGroup.add(ring); // aggiunto al gruppo
-}
-
-const radialLines = 50;
-for (let i = 0; i < radialLines; i++) {
-  const angle = (i / radialLines) * Math.PI * 2;
-  const x = Math.cos(angle) * cylinderRadius;
-  const z = Math.sin(angle) * cylinderRadius;
-
-  const points = [new THREE.Vector3(0, baseY, 0), new THREE.Vector3(x, baseY, z)];
-  const geom = new THREE.BufferGeometry().setFromPoints(points);
-  const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1 });
-  const line = new THREE.Line(geom, mat);
-
-  radialGroup.add(line); // aggiunto al gruppo
-}
-
-scene.add(radialGroup);
-radialGroup.position.set(0, 0.09, 0); // Posiziona il gruppo al centro della scena
-radialGroup.rotation.set(0, Math.PI*0.5, 0); // Ruota il gruppo per allinearlo con l'asse Y
-radialGroup.scale.set(0.965, 0.965, 0.965); // Mantieni la scala originale
-*/
 // Creazione del cilindro PIENO PER NON VEDERE IL TUNNEL
 const cylinderPIENO = new THREE.CylinderGeometry(4.1,4.1,4,64,1,true);
 const materialPIENO = new THREE.MeshBasicMaterial({ color: 0x000000,transparent: false, opacity: 1,side: THREE.BackSide});

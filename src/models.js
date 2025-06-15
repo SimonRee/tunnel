@@ -1,7 +1,16 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { LoadingManager } from "three";
 
-const loader = new GLTFLoader();
+// Ricevi il manager esternamente
+let loader; // ← dichiarato fuori
+
+export let sharedManager;
+
+export function setLoadingManager(manager) {
+  sharedManager = manager;
+  loader = new GLTFLoader(sharedManager); // ← lo inizializzi solo dopo
+}
 const clickableModels = [];
 export const modelsGroup = new THREE.Group(); // Gruppo globale
 
@@ -36,7 +45,7 @@ const metalloMaterial = new THREE.MeshPhysicalMaterial({
 });
 
 //materiale metallo arrugginito
-const textureLoaderRuggine = new THREE.TextureLoader();
+const textureLoaderRuggine = new THREE.TextureLoader(sharedManager);
 const rustTexture = textureLoaderRuggine.load('/ruggine.png');
 const metalloArrugginito = new THREE.MeshPhysicalMaterial({
   color: 0xd0d0d0,
@@ -51,7 +60,7 @@ const metalloArrugginito = new THREE.MeshPhysicalMaterial({
 });
 
 //materiale termocamera
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new THREE.TextureLoader(sharedManager);
 const thermalMatcap = textureLoader.load('/matcap-thermo.png'); 
 
 const termocameraMaterial = new THREE.MeshMatcapMaterial({
@@ -60,7 +69,7 @@ const termocameraMaterial = new THREE.MeshMatcapMaterial({
 });
 
 //materiale MORFEO
-const textureLoaderMorfeo = new THREE.TextureLoader();
+const textureLoaderMorfeo = new THREE.TextureLoader(sharedManager);
 const plasticaMorfeo = textureLoaderMorfeo.load('/plasticaMorfeo.png'); 
 
 const plastica = new THREE.MeshMatcapMaterial({
@@ -69,7 +78,7 @@ const plastica = new THREE.MeshMatcapMaterial({
 });
 
 //materiale TEAMCRO
-const textureLoaderTEAMCRO = new THREE.TextureLoader();
+const textureLoaderTEAMCRO = new THREE.TextureLoader(sharedManager);
 
 const colorMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/color.jpg');
 colorMapTEAMCRO.encoding = THREE.sRGBEncoding;
@@ -83,7 +92,7 @@ const rockMaterial = new THREE.MeshStandardMaterial({
   normalMap: normalMapTEAMCRO,
   roughnessMap: roughnessMapTEAMCRO,
   displacementMap: displacementMapTEAMCRO,
-  displacementScale: 0.03, // solo se hai una geometria ad alta suddivisione
+  displacementScale: 0.01, // solo se hai una geometria ad alta suddivisione
   roughness: 0.8, // maggiore ruvidezza per un aspetto più roccioso
   metalness: 0.0, // roccia non metallica
 });
@@ -319,7 +328,7 @@ export function loadAndPlaceModels(scene) {
     });
   });
 
-  scene.add(modelsGroup);
+  scene.add(modelsGroup); //modelsGroup è il gruppo globale che contiene tutti i modelli a inizio codice
 }
 
 //FUNZIONE ROTAZIONE MODELLI  --posso rendere non uguali le rotazioni, modificando le rotazioni iniziali dei modelli nel modelsGroup
