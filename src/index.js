@@ -695,7 +695,7 @@ labelsData.forEach(data => {
   label.sync();
 
   // Sfondo nero
-  const bgGeo = new THREE.PlaneGeometry(0.28, 0.12);
+  const bgGeo = new THREE.PlaneGeometry(0.30, 0.12);
   const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true });
   const bg = new THREE.Mesh(bgGeo, bgMat);
   bg.position.z = -0.01;
