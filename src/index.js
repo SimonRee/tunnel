@@ -666,7 +666,7 @@ const labelRadius = 3.3;
 
 // Definisci le etichette con angolo e link
 const labelsData = [//questi dati non modificano nulla, perché le modifiche vanno fatte nella parte responsive
-  { text: 'ABOUT', angle: Math.PI * 0.1, y: -0.97, link: 'https://wddc-groupieml.webflow.io/about' }, // basso
+  { text: 'ABOUT US', angle: Math.PI * 0.1, y: -0.97, link: 'https://wddc-groupieml.webflow.io/about' }, // basso
   { text: 'FLATFADE', angle: -Math.PI * 0.1, y: -0.97, link: 'https://wddc-groupieml.webflow.io/tunnel' }, // basso
   { text: 'PSICHE', angle: -Math.PI * 0.04, y: 1.06, link: 'https://wddc-groupieml.webflow.io/psiche' }, // alto
   { text: 'SPECCHIO', angle: Math.PI * 0.04, y: 1.06, link: 'https://wddc-groupieml.webflow.io/specchio' }, // alto
@@ -679,7 +679,13 @@ labelsData.forEach(data => {
   const label = new Text();
   label.text = data.text;
   label.font = "/Fonts/ClashGrotesk/ClashGrotesk-Regular.ttf";
-  label.fontSize = 0.07;
+  // Font size differenziato
+  if (data.text === "FLATFADE" || data.text === "ABOUT US") {
+    label.fontSize = 0.055; // più piccolo
+  } else {
+    label.fontSize = 0.060; // standard
+  }
+
   label.color = data.text === "SPECCHIO" ? 0xaaaaaa : 0xffffff;
   label.anchorX = 'center';
   label.anchorY = 'middle';
@@ -689,7 +695,7 @@ labelsData.forEach(data => {
   label.sync();
 
   // Sfondo nero
-  const bgGeo = new THREE.PlaneGeometry(0.36, 0.12);
+  const bgGeo = new THREE.PlaneGeometry(0.28, 0.12);
   const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true });
   const bg = new THREE.Mesh(bgGeo, bgMat);
   bg.position.z = -0.01;
@@ -720,7 +726,7 @@ function updateNavLabelAngles() {
     const data = labelsData[index];
     
     // Calcolo nuovo angolo solo se la y è negativa (etichette in basso)
-    let baseAngle = data.text === 'ABOUT' ? Math.PI * 0.14 : 
+    let baseAngle = data.text === 'ABOUT US' ? Math.PI * 0.14 : 
                     data.text === 'FLATFADE' ? -Math.PI * 0.14 :
                     data.text === 'SPECCHIO' ? Math.PI * 0.04 :
                     data.text === 'PSICHE' ?-Math.PI * 0.04: 0;
