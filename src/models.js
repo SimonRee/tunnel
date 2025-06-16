@@ -87,7 +87,7 @@ const roughnessMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/roughness
 const displacementMapTEAMCRO = textureLoaderTEAMCRO.load('/TextureTeamcro/displacement.png'); // opzionale
 
 const rockMaterial = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0x292929), // tono più scuro
+  color: new THREE.Color(0x4f4f4f), // tono più scuro
   map: colorMapTEAMCRO,
   normalMap: normalMapTEAMCRO,
   roughnessMap: roughnessMapTEAMCRO,
