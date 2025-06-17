@@ -31,19 +31,15 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background-color: white;
   mix-blend-mode: difference;
   pointer-events: none;
-  transform: translate(-50%, -50% scale(1));
+  transform: translate(-50%, -50% );
   z-index: 12;
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease,
-    width 0.2s ease,
-    height 0.2s ease;
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
 canvas {
