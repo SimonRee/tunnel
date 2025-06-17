@@ -5,6 +5,7 @@ import splinePrincipale from "./splinePrincipale.js";
 import { modelsGroup, getFocusedModel, getIsResetting, setLoadingManager, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 import { Text } from 'troika-three-text';
 import { mod } from "three/tsl";
+import lottie from "lottie-web"; 
 
 //GESTIRE IL LOADER DELLA PAGINAAAA
 const loadingScreen = document.getElementById("loading-screen");
@@ -29,10 +30,19 @@ manager.onLoad = () => {
 };
 
 manager.onError = (url) => {
-  console.error(`❌ Errore nel caricamento di ${url}`);
+  console.error(` Errore nel caricamento di ${url}`);
 };
 
 setLoadingManager(manager);
+
+//animazione di caricamento
+lottie.loadAnimation({
+  container: document.getElementById("loading-animation"),
+  renderer: "svg",
+  loop: true,
+  autoplay: true,
+  path: "/caricamento.json", // assicurati che il path sia corretto
+});
 
 
 // Cursore personalizzato CERCHIO CURSORE
@@ -720,7 +730,7 @@ labelsData.forEach(data => {
     label.fontSize = 0.060; // standard
   }
 
-  label.color = data.text === "SPECCHIO" ? 0xaaaaaa : 0xffffff;
+  label.color = data.text === "SPECCHIO" ? 0x636363 : 0xffffff;
   label.anchorX = 'center';
   label.anchorY = 'middle';
   label.outlineWidth = 0.0001; //  0.005 ≈ 1px 
