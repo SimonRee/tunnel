@@ -894,8 +894,11 @@ window.addEventListener("message", function(event) {
   }
 
   if (event.data && event.data.type === "showCursor") {
-    customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%) scale(1)`;
-    customCursor.style.opacity = "1";
+  // Aggiorna subito le coordinate del cursore per evitare trascinamento
+  cursorX = targetX;
+  cursorY = targetY;
+  customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%) scale(1)`;
+  customCursor.style.opacity = "1";
   }
 });
 
