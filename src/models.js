@@ -215,9 +215,9 @@ const rockMaterial = new THREE.MeshStandardMaterial({
       name: "VAGONE",
     },
     {
-      path: "/models/mano.glb",//andrà sostituita ---CON PARMA----------- INDEX 14
-      pos: [1.725, -0.4, 2.45],
-      scale: 0.4,
+      path: "/models/Parma.glb",// index 14
+      pos: [1.725, -0.35, 2.45],
+      scale: 0.38,
       rotY: 60,
       material: "metallo",
       name: "43123",

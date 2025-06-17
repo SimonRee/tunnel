@@ -4,6 +4,7 @@ import spline from "./spline.js";
 import splinePrincipale from "./splinePrincipale.js";
 import { modelsGroup, getFocusedModel, getIsResetting, setLoadingManager, loadAndPlaceModels,getClickableModels,RuotaModels,focusModelOnCamera,updateFocusedModel, createFadeCone } from "./models.js";
 import { Text } from 'troika-three-text';
+import { mod } from "three/tsl";
 
 //GESTIRE IL LOADER DELLA PAGINAAAA
 const loadingScreen = document.getElementById("loading-screen");
@@ -609,6 +610,7 @@ function updateCursorOnHover() {
     //document.body.style.cursor = "pointer";
     customCursor.style.width = "24px";// CURSORE CERCHIO
     customCursor.style.height = "24px";// CURSORE CERCHIO
+    //customCursor.style.mixBlendMode = "normal"; // per togliere difference sopra gli oggetti
 
     isHoveringClickable = true;
 
@@ -638,6 +640,7 @@ function updateCursorOnHover() {
       //document.body.style.cursor = "default";
       customCursor.style.width = "16px"; // CURSORE CERCHIO
       customCursor.style.height = "16px";// CURSORE CERCHIO
+      //customCursor.style.mixBlendMode = "difference"; // per far ritrnare differece
 
       isHoveringClickable = false;
     }
