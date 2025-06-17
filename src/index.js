@@ -743,6 +743,7 @@ labelsData.forEach(data => {
   const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true });
   const bg = new THREE.Mesh(bgGeo, bgMat);
   bg.position.z = -0.01;
+  
 
   group.add(bg);
   group.add(label);

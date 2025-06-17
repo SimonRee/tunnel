@@ -52,7 +52,7 @@ canvas {
 .InformazioniBase {
   transition: opacity 0.5s ease;
   font-family: ClashGrotesk-Variable, sans-serif;
-  font-weight: 350;
+  font-weight: 300;
   margin: 0;
   padding: 0;
   width: 100vw;
@@ -72,9 +72,9 @@ canvas {
 .info-top-bar span {
   text-align: center;
   flex-shrink: 0;
-  padding-left: 25px;
-  padding-right: 25px;
-  padding-top: 20px;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+  padding-top: 1.2rem;
 }
 
 .info-bottom-left{
