@@ -37,9 +37,13 @@ body {
   background-color: white;
   mix-blend-mode: difference;
   pointer-events: none;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50% scale(1));
   z-index: 12;
-  transition: width 0.2s ease, height 0.2s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    width 0.2s ease,
+    height 0.2s ease;
 }
 
 canvas {

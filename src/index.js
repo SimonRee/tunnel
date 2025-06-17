@@ -887,31 +887,18 @@ function animate() {
 animate();
 
 
-// RICEVE MESSAGGIO DA WEBFLOW PER SALTARE IL TUNNEL
 window.addEventListener("message", function(event) {
-  if (event.data && event.data.type === "skipTunnel") {
-    positionAlongPath = 1;
-    targetPosition = 1;
-    FinitoTunnel = true;
+  if (event.data && event.data.type === "hideCursor") {
+    customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%) scale(0)`;
+    customCursor.style.opacity = "0";
+  }
 
-    const finalPos = splinePrincipale.getPointAt(1);
-    camera.position.copy(finalPos);
-    camera.lookAt(new THREE.Vector3(-1, 0, 0));
-
-    controls.enabled = true;
-    controls.enablePan = false;
-    controls.enableZoom = false;
-    controls.minPolarAngle = Math.PI / 2;
-    controls.maxPolarAngle = Math.PI / 2;
-    controls.minAzimuthAngle = -Infinity;
-    controls.maxAzimuthAngle = Infinity;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = -0.3;
-
-    console.log("Messaggio ricevuto da Webflow: skipTunnel → salto tunnel");
+  if (event.data && event.data.type === "showCursor") {
+    customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%) scale(1)`;
+    customCursor.style.opacity = "1";
   }
 });
+
 
 // Resize
 window.addEventListener("resize", () => {
