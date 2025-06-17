@@ -33,6 +33,29 @@ manager.onError = (url) => {
 
 setLoadingManager(manager);
 
+
+// Cursore personalizzato CERCHIO CURSORE
+const customCursor = document.getElementById("customCursor");
+let cursorX = window.innerWidth / 2;
+let cursorY = window.innerHeight / 2;
+let targetX = cursorX;
+let targetY = cursorY;
+const trailingSpeed = 0.15;
+
+window.addEventListener("mousemove", (e) => {
+  targetX = e.clientX;
+  targetY = e.clientY;
+});
+
+// Anima il movimento del cursore
+function animateCursor() {
+  cursorX += (targetX - cursorX) * trailingSpeed;
+  cursorY += (targetY - cursorY) * trailingSpeed;
+  customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
 //INIZIALIZZA IL RAYCASTER PER POTER CLICCARE SUGLI OGGETTI
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
 const mouse = new THREE.Vector2();
@@ -564,7 +587,9 @@ function updateCursorOnHover() {
 
   // Evita l'hover e il cursore pointer se siamo ancora nel tunnel
   if (positionAlongPath <= 0.99) {
-    document.body.style.cursor = "default";
+    //document.body.style.cursor = "default";
+    customCursor.style.width = "16px"; // CURSORE CERCHIO
+    customCursor.style.height = "16px";// CURSORE CERCHIO
     isHoveringClickable = false;
     hoveredModel = null;
     nameDiv.style.opacity = "0";
@@ -581,7 +606,10 @@ function updateCursorOnHover() {
       selected = selected.parent;
     }
 
-    document.body.style.cursor = "pointer";
+    //document.body.style.cursor = "pointer";
+    customCursor.style.width = "24px";// CURSORE CERCHIO
+    customCursor.style.height = "24px";// CURSORE CERCHIO
+
     isHoveringClickable = true;
 
     // Mostra il nome del modello
@@ -607,7 +635,10 @@ function updateCursorOnHover() {
 
   } else {
     if (isHoveringClickable) {
-      document.body.style.cursor = "default";
+      //document.body.style.cursor = "default";
+      customCursor.style.width = "16px"; // CURSORE CERCHIO
+      customCursor.style.height = "16px";// CURSORE CERCHIO
+
       isHoveringClickable = false;
     }
 
@@ -746,7 +777,10 @@ function updateNavInteractions() {
   if (intersects.length > 0) {
     const hovered = intersects[0].object.parent; // Prendiamo il gruppo
 
-    document.body.style.cursor = "pointer";
+    //document.body.style.cursor = "pointer";
+    customCursor.style.width = "24px";// CURSORE CERCHIO
+    customCursor.style.height = "24px";// CURSORE CERCHIO
+
 
     clickableNavs.forEach(group => {
       const scaleTarget = group === hovered ? 1.1 : 1;
@@ -762,7 +796,10 @@ function updateNavInteractions() {
     }
 
   } else {
-    document.body.style.cursor = "default";
+    //document.body.style.cursor = "default";
+    customCursor.style.width = "16px"; // CURSORE CERCHIO
+    customCursor.style.height = "16px";// CURSORE CERCHIO
+
     clickableNavs.forEach(group => {
       group.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
     });
