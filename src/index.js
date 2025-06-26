@@ -636,6 +636,47 @@ window.addEventListener("click", (event) => {
   }
 });
 
+// Rende OGGETTI e NAVBAR cliccabili (MOBILE TOUCH)
+window.addEventListener("touchend", (event) => {
+  const touch = event.changedTouches[0];
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  // Tocco su modelli 3D
+  const intersects = raycaster.intersectObjects(getClickableModels(), true);
+  if (intersects.length > 0) {
+    let selected = intersects[0].object;
+    while (selected.parent && !getClickableModels().includes(selected)) {
+      selected = selected.parent;
+    }
+
+    if (selected.userData.originalScale) {
+      selected.scale.setScalar(selected.userData.originalScale);
+    }
+
+    focusModelOnCamera(selected);
+    mouse.clicked = true;
+    return;
+  }
+
+  // Tocco su label della navbar
+  const intersectsNav = raycaster.intersectObjects(clickableNavs, true);
+  if (intersectsNav.length > 0) {
+    let selected = intersectsNav[0].object;
+    while (selected.parent && !clickableNavs.includes(selected)) {
+      selected = selected.parent;
+    }
+
+    const link = selected.userData.link;
+    if (link) {
+      fadeToBlackAndRedirect(link);
+    }
+  }
+});
+
 
 
 //CAMBIA POINTER SU OGGETTO CLICCCABILE
