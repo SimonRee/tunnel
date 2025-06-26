@@ -810,7 +810,16 @@ labelsData.forEach(data => {
   group.userData.originalAngle = angle; // salva l'angolo originale
   group.position.x = Math.cos(angle) * labelRadius;
   group.position.z = Math.sin(angle) * labelRadius;
-  group.position.y = data.y;
+
+  let yPos = data.y;
+
+// Alza le scritte sopra e sotto su mobile
+if (isMobile) {
+  if (data.y < 0) yPos += 0.0; // scritte in basso: alzale
+  else yPos += 0.5; // scritte in alto: alzale anche loro
+}
+
+group.position.y = yPos;
 
   group.userData.link = data.link;
 
@@ -822,7 +831,6 @@ labelsData.forEach(data => {
 
 //per rendere responsive le etichette della NavBar
 function updateNavLabelAngles() {
-  const isMobile = window.innerWidth < 768;
 
   navLabels.forEach((group, index) => {
     const data = labelsData[index];
@@ -833,7 +841,7 @@ function updateNavLabelAngles() {
                     data.text === 'SPECCHIO' ? Math.PI * 0.04 :
                     data.text === 'PSICHE' ?-Math.PI * 0.04: 0;
 
-    const newAngle = isMobile && data.y < 0 ? baseAngle * 0.6 : baseAngle;
+    const newAngle = isMobile && data.y < 0 ? baseAngle * 0.3 : baseAngle;
 
     data.angle = newAngle;
     group.userData.originalAngle = newAngle;
