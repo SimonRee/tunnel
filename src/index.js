@@ -390,7 +390,7 @@ if (isMobile) {
           baseMultiplier = 0.002;
         }
 
-        const scrollSpeed = Math.sign(deltaY) * Math.min(Math.abs(deltaY) * baseMultiplier, 0.007);
+        const scrollSpeed = Math.sign(deltaY) * Math.min(Math.abs(deltaY) * baseMultiplier, 0.015);
         targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
       }
 
@@ -638,6 +638,10 @@ window.addEventListener("click", (event) => {
 
 // Rende OGGETTI e NAVBAR cliccabili (MOBILE TOUCH)
 window.addEventListener("touchend", (event) => {
+  if (isDragging) {
+    mouse.clicked = false;
+    return; // blocca il touch se era un drag
+  }
   const touch = event.changedTouches[0];
   const rect = renderer.domElement.getBoundingClientRect();
   mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
