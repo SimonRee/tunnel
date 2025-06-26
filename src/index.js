@@ -816,7 +816,7 @@ labelsData.forEach(data => {
 // Alza le scritte sopra e sotto su mobile
 if (isMobile) {
   if (data.y < 0) yPos += 0.0; // scritte in basso: alzale
-  else yPos += 0.5; // scritte in alto: alzale anche loro
+  else yPos += 0.2; // scritte in alto: alzale anche loro
 }
 
 group.position.y = yPos;
