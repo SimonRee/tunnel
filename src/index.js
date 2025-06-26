@@ -390,7 +390,7 @@ if (isMobile) {
           baseMultiplier = 0.002;
         }
 
-        const scrollSpeed = Math.sign(deltaY) * Math.min(Math.abs(deltaY) * baseMultiplier, 0.02);
+        const scrollSpeed = Math.sign(deltaY) * Math.min(Math.abs(deltaY) * baseMultiplier, 0.01);
         targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
       }
 
