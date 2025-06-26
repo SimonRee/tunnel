@@ -94,7 +94,7 @@ scene.add(cameraWrapper);
 
 //FOV della telecamera pre e post faccia deriansky
 const initialFov = isMobile ? 35 : 25; // esempio valore iniziale FOV per vedere tutta la faccia è 30
-const finalFov = isMobile ? 60 : 40; // valore finale FOV a cui vuoi arrivare
+const finalFov = isMobile ? 50 : 40; // valore finale FOV a cui vuoi arrivare
 
 loadAndPlaceModels(scene, camera); //per mettere i modelli 3D da models.js
 
