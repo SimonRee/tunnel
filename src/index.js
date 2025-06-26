@@ -7,6 +7,8 @@ import { Text } from 'troika-three-text';
 import { mod } from "three/tsl";
 import lottie from "lottie-web"; 
 
+const isMobile = window.innerWidth < 768; // Controlla se il dispositivo è mobile // per testare imposta a true
+
 //GESTIRE IL LOADER DELLA PAGINAAAA
 const loadingScreen = document.getElementById("loading-screen");
 
@@ -53,19 +55,23 @@ let targetX = cursorX;
 let targetY = cursorY;
 const trailingSpeed = 0.15;
 
-window.addEventListener("mousemove", (e) => {
-  targetX = e.clientX;
-  targetY = e.clientY;
-});
 
-// Anima il movimento del cursore
-function animateCursor() {
-  cursorX += (targetX - cursorX) * trailingSpeed;
-  cursorY += (targetY - cursorY) * trailingSpeed;
-  customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
-  requestAnimationFrame(animateCursor);
+
+if (!isMobile) {
+  window.addEventListener("mousemove", (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+  });
+
+  function animateCursor() {
+    cursorX += (targetX - cursorX) * trailingSpeed;
+    cursorY += (targetY - cursorY) * trailingSpeed;
+    customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
+    requestAnimationFrame(animateCursor);
+  }
+
+  animateCursor();
 }
-animateCursor();
 
 //INIZIALIZZA IL RAYCASTER PER POTER CLICCARE SUGLI OGGETTI
 const raycaster = new THREE.Raycaster();//per rendere gli oggetti cliccabili
@@ -305,44 +311,95 @@ let targetPosition = positionAlongPath;
 let autoScrollFromStart = false; //gestisce inizio tunnel
 let autoScrollToEnd = false;// gestisce fine tunnel
 
-window.addEventListener(
-  "wheel",
-  (event) => {
-    if (positionAlongPath >= 0.9999 || autoScrollToEnd) return;
+// DESKTOP: Scroll con mouse wheel
+if (!isMobile) {
+  window.addEventListener(
+    "wheel",
+    (event) => {
+      if (positionAlongPath >= 0.9999 || autoScrollToEnd) return;
 
-    // Trigger iniziale: da 0.1 a 0.35 automatico
-    if (positionAlongPath < 0.35 && !autoScrollFromStart) {
-      autoScrollFromStart = true;
-      targetPosition = 0.35;
-      return;
-    }
-
-    // tirgger finale: da 0.8 a 1.0 automatico
-    if (positionAlongPath > 0.8) {
-      autoScrollToEnd = true;
-      // Imposta l'obiettivo finale
-      targetPosition = 1;
-
-    } else {
-      // Dinamica normale nelle fasi iniziali
-      let baseMultiplier;
-
-      if (positionAlongPath < 0.3) {
-        baseMultiplier = 0.00005; //GESTISCE IL PRIMISSIMO SCROLL
-      } else if (positionAlongPath < 0.8) {
-        baseMultiplier = 0.0002;
-      } else {
-        baseMultiplier = 0.0002;
+      // Trigger iniziale: da 0.1 a 0.35 automatico
+      if (positionAlongPath < 0.35 && !autoScrollFromStart) {
+        autoScrollFromStart = true;
+        targetPosition = 0.35;
+        return;
       }
 
-      let scrollSpeed = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) * baseMultiplier, 0.007);
-      targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
-    }
+      // Trigger finale
+      if (positionAlongPath > 0.8) {
+        autoScrollToEnd = true;
+        targetPosition = 1;
+      } else {
+        let baseMultiplier;
 
-    event.preventDefault();
-  },
-  { passive: false }
-);
+        if (positionAlongPath < 0.3) {
+          baseMultiplier = 0.00005;
+        } else if (positionAlongPath < 0.8) {
+          baseMultiplier = 0.0002;
+        } else {
+          baseMultiplier = 0.0002;
+        }
+
+        const scrollSpeed = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) * baseMultiplier, 0.007);
+        targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
+      }
+
+      event.preventDefault();
+    },
+    { passive: false }
+  );
+}
+
+// MOBILE: Scroll con touchmove
+if (isMobile) {
+  let lastY = null;
+
+  window.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 1) {
+      lastY = e.touches[0].clientY;
+    }
+  });
+
+  window.addEventListener(
+    "touchmove",
+    (e) => {
+      if (e.touches.length !== 1 || lastY === null) return;
+
+      const currentY = e.touches[0].clientY;
+      const deltaY = lastY - currentY;
+
+      if (positionAlongPath >= 0.9999 || autoScrollToEnd) return;
+
+      if (positionAlongPath < 0.35 && !autoScrollFromStart) {
+        autoScrollFromStart = true;
+        targetPosition = 0.35;
+        return;
+      }
+
+      if (positionAlongPath > 0.8) {
+        autoScrollToEnd = true;
+        targetPosition = 1;
+      } else {
+        let baseMultiplier;
+
+        if (positionAlongPath < 0.3) {
+          baseMultiplier = 0.0006;
+        } else if (positionAlongPath < 0.8) {
+          baseMultiplier = 0.002;
+        } else {
+          baseMultiplier = 0.002;
+        }
+
+        const scrollSpeed = Math.sign(deltaY) * Math.min(Math.abs(deltaY) * baseMultiplier, 0.007);
+        targetPosition = Math.min(Math.max(targetPosition + scrollSpeed, 0), 1);
+      }
+
+      lastY = currentY;
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+}
 
 let FinitoTunnel = false; //variabile che controlla l'uscita dal percorso e l'attivazione degli orbit controls
 const desiredLookAt = new THREE.Vector3(-1, 0, 0); //ho dovuto metterlo ANCHE qui oltre che alla riga 211 per eliminare lo scattino che faceva a fine tunnel che guardava inizio splinePrincipale

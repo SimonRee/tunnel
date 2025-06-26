@@ -151,3 +151,14 @@ canvas {
   width: 20vw;
   height: 20vw;
 }
+
+
+@media (max-width: 768px) {
+  #customCursor {
+    display: none !important;
+  }
+
+  body {
+    cursor: default !important;
+  }
+}
