@@ -385,7 +385,7 @@ if (isMobile) {
         if (positionAlongPath < 0.3) {
           baseMultiplier = 0.0006;
         } else if (positionAlongPath < 0.8) {
-          baseMultiplier = 0.01;
+          baseMultiplier = 0.1;
         } else {
           baseMultiplier = 0.002;
         }
@@ -816,7 +816,7 @@ labelsData.forEach(data => {
 // Alza le scritte sopra e sotto su mobile
 if (isMobile) {
   if (data.y < 0) yPos += 0.0; // scritte in basso: alzale
-  else yPos += 0.245; // scritte in alto: alzale anche loro
+  else yPos += 0.255; // scritte in alto: alzale anche loro
 }
 
 group.position.y = yPos;
