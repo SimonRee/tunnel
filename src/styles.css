@@ -161,4 +161,42 @@ canvas {
   body {
     cursor: default !important;
   }
+
+  .InformazioniBase {
+    font-size: 0.85rem;
+    padding: 0 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-top-bar {
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+    padding-top: 1rem;
+  }
+
+  .info-top-bar span {
+    padding: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .info-bottom-left,
+  .info-bottom-right {
+    position: static;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .label {
+    display: block;
+    font-weight: 600;
+    margin-top: 0.3rem;
+  }
 }

@@ -434,15 +434,8 @@ function updateCamera() {
   
   positionAlongPath += (targetPosition - positionAlongPath) * lerpSpeed;
 
-  let pos = splinePrincipale.getPointAt(positionAlongPath);
-
-// Alla fine del tunnel, modifica la posizione su mobile
-if (positionAlongPath >= 0.9999 && isMobile) {
-  pos = pos.clone();
-  pos.y -= 0.1; // abbassa la camera solo su mobile
-}
-
-camera.position.copy(pos);
+  const pos = splinePrincipale.getPointAt(positionAlongPath);
+  camera.position.copy(pos);
   
   // Evita il lookAt che guarda indietro a fine tunnel
   if (positionAlongPath < 0.9999) {
