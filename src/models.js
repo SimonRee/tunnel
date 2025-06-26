@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { LoadingManager } from "three";
 
+const isMobile = window.innerWidth < 768; // Controlla se il dispositivo è mobile
+
 // Ricevi il manager esternamente
 let loader; // ← dichiarato fuori
 
@@ -442,7 +444,7 @@ export function updateFocusedModel(camera) {
 
   } else {
   // Movimento verso un punto davanti alla camera, ma con offset in alto a sinistra GESTIRE POSZIONE POST CLICK
-  const offset = new THREE.Vector2(-0.7, 0.25); // -x: sinistra, +y: alto
+  const offset = isMobile ? new THREE.Vector2(0, 0.35) : new THREE.Vector2(-0.7, 0.25); // -x: sinistra, +y: alto , gestisce in modo siverso per mobile e desktop
   const offsetPosition = new THREE.Vector3(offset.x, offset.y, 0.5); // z = profondità in clip space
 
   offsetPosition.unproject(camera); // Trasformazione in world space
