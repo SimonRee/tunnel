@@ -6,6 +6,7 @@ import { modelsGroup, getFocusedModel, getIsResetting, setLoadingManager, loadAn
 import { Text } from 'troika-three-text';
 import { mod } from "three/tsl";
 import lottie from "lottie-web"; 
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"; //aggiunto per caricare la testa wireframe
 
 const isMobile = window.innerWidth < 768; // Controlla se il dispositivo è mobile // per testare imposta a true
 
@@ -164,12 +165,13 @@ scene.environment = skyboxTexture;
 //controlli per la camera
 const controls = new OrbitControls(camera, renderer.domElement);
 
+/*
 //IMMAGINE PNG DI DERIANSKY
 // Caricamento della texture PNG
 const textureLoader = new THREE.TextureLoader(manager);
 const texture = textureLoader.load("/DERIO.png");
 
-// Creazione del piano 16:9
+ Creazione del piano 16:9
 const width = 8; // Larghezza del piano
 const height = width * (9 / 16); // Calcolo dell'altezza per mantenere il rapporto 16:9
 const planeGeometry = new THREE.PlaneGeometry(width, height);
@@ -187,7 +189,34 @@ plane.rotation.y = Math.PI / 2;
 scene.add(plane);
 // Posizioni iniziale e finale del piano
 const startPosition = new THREE.Vector3(10.7, 7.38, 0.12);
-const endPosition = new THREE.Vector3(10.52, 7.48, 0.53);
+const endPosition = new THREE.Vector3(10.52, 7.48, 0.53); */
+
+let TestaDeriansky;
+let startModelPosition = new THREE.Vector3(10.9, 7.05, 0);
+let endModelPosition = new THREE.Vector3(10.17, 6.95, 0.46);
+
+
+const loaderTESTA = new GLTFLoader(manager);
+loaderTESTA.load("/DerianskyFrame_rotated.glb", (gltf) => {
+  TestaDeriansky = gltf.scene;
+
+  TestaDeriansky.traverse((child) => {
+    if (child.isMesh) {
+      child.rotation.x = Math.PI / 20;
+      if (child.material) {
+        child.material.fog = false; //  Esclude la nebbia
+      }
+    }
+  });
+
+  // 2. Applica trasformazioni SUL GRUPPO PRINCIPALE
+  TestaDeriansky.position.copy(startModelPosition);
+  TestaDeriansky.scale.set(1.5, 1.5, 1.5);
+
+  // 3. Aggiungilo alla scena globale
+  scene.add(TestaDeriansky);
+});
+
 
 // Creazione del cilindro wireframe segmentato
 const cylinderRadius = 4;
@@ -472,7 +501,7 @@ function updateCamera() {
   }
 }
 
-//funzione per far MUOVERE FACCIA DERIANSKY
+/*funzione per far MUOVERE FACCIA DERIANSKY
 function updatePlanePosition(positionAlongPath) {
   // Mappa positionAlongPath da [0, 0.1] a [0, 1]
   let t = THREE.MathUtils.clamp(positionAlongPath / 0.35, 0, 1); //0.35 bisogna mettere la positionAlonghPath della transizione iniziale fra 0 e il numero desiderato in questo caso (0.35)
@@ -491,7 +520,38 @@ function updatePlanePosition(positionAlongPath) {
     infoDiv.style.opacity = "1";
     infoDiv.style.pointerEvents = "auto";
   }
+} */
+
+function updateTestaPosition(positionAlongPath) {
+  if (!TestaDeriansky) return;
+
+  let t = THREE.MathUtils.clamp(positionAlongPath / 0.35, 0, 1);
+  t = 1 - Math.pow(1 - t, 3);
+  TestaDeriansky.position.lerpVectors(startModelPosition, endModelPosition, t);
+
+  const infoDiv = document.querySelector(".InformazioniBase");
+  if (!infoDiv) return;
+  if (positionAlongPath >= 0.05) {
+    infoDiv.style.opacity = "0";
+    infoDiv.style.pointerEvents = "none";
+  } else {
+    infoDiv.style.opacity = "1";
+    infoDiv.style.pointerEvents = "auto";
+  }
 }
+
+function updateTestaRotationFromCursor() {
+  if (!TestaDeriansky || positionAlongPath > 0.35) return;
+
+  const normalizedX = mouse.x / 2; // -1 (sx) → 1 (dx)
+  const maxRotationY = THREE.MathUtils.degToRad(40); // quanto può ruotare massimo a dx/sx
+
+  const targetRotY = Math.PI / 2 + normalizedX * maxRotationY;
+
+  TestaDeriansky.rotation.y = THREE.MathUtils.lerp(TestaDeriansky.rotation.y, targetRotY, 0.05);
+}
+
+
 
 //funzione per aggiornare il fov della telecamera pre e post faccia deriansky
 function updateCameraFov(positionAlongPath) {
@@ -964,7 +1024,9 @@ function animate() {
   requestAnimationFrame(animate);
   updateCamera();
   // Aggiorna posizione del piano basata sulla posizione della telecamera lungo il percorso
-  updatePlanePosition(positionAlongPath);
+  //updatePlanePosition(positionAlongPath);
+  updateTestaPosition(positionAlongPath);
+  updateTestaRotationFromCursor();
   //aggiorna il fov della telecamera pre e post faccia deriansky
   updateCameraFov(positionAlongPath);
   //aggiorna la nebbia in base alla posizione lungo il percorso
