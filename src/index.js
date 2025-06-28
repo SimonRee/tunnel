@@ -195,6 +195,10 @@ let TestaDeriansky;
 let startModelPosition = new THREE.Vector3(10.9, 7.05, 0);
 let endModelPosition = new THREE.Vector3(10.17, 6.95, 0.46);
 
+// Se mobile, cambia solo la Z
+if (isMobile) {
+  startModelPosition.z = -0.2; // oppure il valore che preferisci
+}
 
 const loaderTESTA = new GLTFLoader(manager);
 loaderTESTA.load("/DerianskyFrame_rotated.glb", (gltf) => {
