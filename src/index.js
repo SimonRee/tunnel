@@ -522,6 +522,8 @@ function updatePlanePosition(positionAlongPath) {
   }
 } */
 
+
+//TRE FUNZIONI PER GESTIRE LA TESTA
 function updateTestaPosition(positionAlongPath) {
   if (!TestaDeriansky) return;
 
@@ -551,6 +553,13 @@ function updateTestaRotationFromCursor() {
   TestaDeriansky.rotation.y = THREE.MathUtils.lerp(TestaDeriansky.rotation.y, targetRotY, 0.05);
 }
 
+function updateTestaVisibility() {
+  if (!TestaDeriansky) return;
+
+  const shouldBeVisible = positionAlongPath < 0.31;
+
+  TestaDeriansky.visible = shouldBeVisible;
+}
 
 
 //funzione per aggiornare il fov della telecamera pre e post faccia deriansky
@@ -1027,6 +1036,7 @@ function animate() {
   //updatePlanePosition(positionAlongPath);
   updateTestaPosition(positionAlongPath);
   updateTestaRotationFromCursor();
+  updateTestaVisibility()
   //aggiorna il fov della telecamera pre e post faccia deriansky
   updateCameraFov(positionAlongPath);
   //aggiorna la nebbia in base alla posizione lungo il percorso
