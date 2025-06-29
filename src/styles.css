@@ -174,10 +174,11 @@ canvas {
 
   .info-bottom-left,
   .info-bottom-right {
+    display: none;
     bottom: 20px;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    padding-bottom: 15vh;
+    padding-bottom: 0.5rem;
     font-size: 0.70rem;
   }
 }
