@@ -44,7 +44,7 @@ lottie.loadAnimation({
   renderer: "svg",
   loop: true,
   autoplay: true,
-  path: "/caricamento.json", // assicurati che il path sia corretto
+  path: "/testa.json", 
 });
 
 //robette per evitare problemi di click durante lo scroll su mobile
