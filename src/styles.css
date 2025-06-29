@@ -163,12 +163,13 @@ canvas {
   }
 
   .InformazioniBase {
-    font-size: 0.60rem; /* leggermente più piccolo per rientrare meglio */
+    font-size: 0.70rem; /* leggermente più piccolo per rientrare meglio */
   }
 
   .info-top-bar span {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    padding-top: 0.5rem;
   }
 
   .info-bottom-left,
@@ -176,7 +177,7 @@ canvas {
     bottom: 20px;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    padding-bottom: 0.5rem;
-    font-size: 0.60rem;
+    padding-bottom: 15vh;
+    font-size: 0.70rem;
   }
 }
