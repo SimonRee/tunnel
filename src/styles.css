@@ -181,4 +181,8 @@ canvas {
     padding-bottom: 0.5rem;
     font-size: 0.70rem;
   }
+  #loading-animation {
+  width: 30vw;
+  height: 30vw;
+}
 }
