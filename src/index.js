@@ -38,6 +38,28 @@ manager.onError = (url) => {
 
 setLoadingManager(manager);
 
+const loaderTESTA = new GLTFLoader(manager);
+loaderTESTA.load("/DerianskyFrame_rotated.glb", (gltf) => {
+  TestaDeriansky = gltf.scene;
+
+  TestaDeriansky.traverse((child) => {
+    if (child.isMesh) {
+      child.rotation.x = Math.PI / 20;
+      if (child.material) {
+        child.material.fog = false; //  Esclude la nebbia
+      }
+    }
+  });
+
+  // 2. Applica trasformazioni SUL GRUPPO PRINCIPALE
+  TestaDeriansky.position.copy(startModelPosition);
+  TestaDeriansky.scale.set(1.5, 1.5, 1.5);
+
+  // 3. Aggiungilo alla scena globale
+  scene.add(TestaDeriansky);
+});
+
+
 //animazione di caricamento
 lottie.loadAnimation({
   container: document.getElementById("loading-animation"),
@@ -200,26 +222,7 @@ if (isMobile) {
   startModelPosition.z = 0.05; // oppure il valore che preferisci
 }
 
-const loaderTESTA = new GLTFLoader(manager);
-loaderTESTA.load("/DerianskyFrame_rotated.glb", (gltf) => {
-  TestaDeriansky = gltf.scene;
 
-  TestaDeriansky.traverse((child) => {
-    if (child.isMesh) {
-      child.rotation.x = Math.PI / 20;
-      if (child.material) {
-        child.material.fog = false; //  Esclude la nebbia
-      }
-    }
-  });
-
-  // 2. Applica trasformazioni SUL GRUPPO PRINCIPALE
-  TestaDeriansky.position.copy(startModelPosition);
-  TestaDeriansky.scale.set(1.5, 1.5, 1.5);
-
-  // 3. Aggiungilo alla scena globale
-  scene.add(TestaDeriansky);
-});
 
 
 // Creazione del cilindro wireframe segmentato
