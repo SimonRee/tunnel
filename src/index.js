@@ -8,6 +8,15 @@ import { mod } from "three/tsl";
 import lottie from "lottie-web"; 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"; //aggiunto per caricare la testa wireframe
 
+//animazione di caricamento
+lottie.loadAnimation({
+  container: document.getElementById("loading-animation"),
+  renderer: "svg",
+  loop: true,
+  autoplay: true,
+  path: "/testa.json", 
+});
+
 const isMobile = window.innerWidth < 768; // Controlla se il dispositivo è mobile // per testare imposta a true
 
 //GESTIRE IL LOADER DELLA PAGINAAAA
@@ -60,14 +69,7 @@ loaderTESTA.load("/DerianskyFrame_rotated.glb", (gltf) => {
 });
 
 
-//animazione di caricamento
-lottie.loadAnimation({
-  container: document.getElementById("loading-animation"),
-  renderer: "svg",
-  loop: true,
-  autoplay: true,
-  path: "/testa.json", 
-});
+
 
 //robette per evitare problemi di click durante lo scroll su mobile
 let touchStartX = null;
