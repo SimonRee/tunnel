@@ -189,31 +189,6 @@ scene.environment = skyboxTexture;
 //controlli per la camera
 const controls = new OrbitControls(camera, renderer.domElement);
 
-/*
-//IMMAGINE PNG DI DERIANSKY
-// Caricamento della texture PNG
-const textureLoader = new THREE.TextureLoader(manager);
-const texture = textureLoader.load("/DERIO.png");
-
- Creazione del piano 16:9
-const width = 8; // Larghezza del piano
-const height = width * (9 / 16); // Calcolo dell'altezza per mantenere il rapporto 16:9
-const planeGeometry = new THREE.PlaneGeometry(width, height);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  map: texture,
-  transparent: true,
-  alphaTest: 0.01, // importante per eliminare artefatti ai bordi
-  fog: false,
-});
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-
-// Rotazione del piano
-plane.rotation.y = Math.PI / 2;
-
-scene.add(plane);
-// Posizioni iniziale e finale del piano
-const startPosition = new THREE.Vector3(10.7, 7.38, 0.12);
-const endPosition = new THREE.Vector3(10.52, 7.48, 0.53); */
 
 let TestaDeriansky;
 let startModelPosition = new THREE.Vector3(10.9, 7.05, 0);
