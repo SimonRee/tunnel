@@ -8,14 +8,14 @@ import { mod } from "three/tsl";
 import lottie from "lottie-web"; 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"; //aggiunto per caricare la testa wireframe
 
-//animazione di caricamento
-lottie.loadAnimation({
+//animazione di caricamento non serve, l'ho sotituita con il video
+/*lottie.loadAnimation({
   container: document.getElementById("loading-animation"),
   renderer: "svg",
   loop: true,
   autoplay: true,
   path: "/testa.json", 
-});
+});*/
 
 const isMobile = window.innerWidth < 768; // Controlla se il dispositivo è mobile // per testare imposta a true
 
